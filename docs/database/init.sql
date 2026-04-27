@@ -21,4 +21,12 @@ CREATE TABLE IF NOT EXISTS Pisos (
     Foto VARCHAR(255),
 );
 
-
+-- TABLA: MiembrosPiso
+CREATE TABLE IF NOT EXISTS MiembrosPiso (
+    id_membresia INT AUTO_INCREMENT PRIMARY KEY,
+    id_piso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    fecha_union TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
+);

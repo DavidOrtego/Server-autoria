@@ -22,8 +22,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "js-yaml": "^4.1.1",
+    "knex": "^3.2.9",
     "mysql2": "^3.22.2",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

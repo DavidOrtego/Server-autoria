@@ -30,3 +30,18 @@ CREATE TABLE IF NOT EXISTS MiembrosPiso (
     FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
+
+--TABLA: Tareas
+CREATE TABLE IF NOT EXISTS Tareas (
+    id_tarea INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(255),
+    estado ENUM('pendiente', 'en_progreso', 'completada') DEFAULT 'pendiente',
+    fechaLimite DATE,
+    id_piso INT NOT NULL,
+    id_usuario INT,
+    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE RESTRICT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE SET NULL
+);
+
+

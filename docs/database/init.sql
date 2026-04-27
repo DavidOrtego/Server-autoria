@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS MiembrosPiso (
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
 );
 
---TABLA: Tareas
+-- TABLA: Tareas
 CREATE TABLE IF NOT EXISTS Tareas (
     id_tarea INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -44,4 +44,14 @@ CREATE TABLE IF NOT EXISTS Tareas (
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE SET NULL
 );
 
-
+-- TABLA: Gastos
+CREATE TABLE IF NOT EXISTS Gastos (
+    id_gasto INT AUTO_INCREMENT PRIMARY KEY,
+    cantidad DECIMAL(10, 2) NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    fecha DATE NOT NULL,
+    id_usuario INT NOT NULL, 
+    id_piso INT NOT NULL,    
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE RESTRICT,
+    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE RESTRICT
+);

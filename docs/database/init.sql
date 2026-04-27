@@ -17,8 +17,10 @@ CREATE TABLE IF NOT EXISTS Pisos (
     id_piso INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(255),
-    NumeroHabitaciones INT,
-    Foto VARCHAR(255),
+    numeroHabitaciones INT,
+    foto VARCHAR(255),
+    nivel INT DEFAULT 1,
+    experiencia INT DEFAULT 0,
 );
 
 -- TABLA: MiembrosPiso

@@ -66,3 +66,16 @@ CREATE TABLE IF NOT EXISTS Deudas (
     FOREIGN KEY (id_gasto) REFERENCES Gastos(id_gasto) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE RESTRICT
 );
+
+-- PROCEDIMIENTO ALMACENADO: Borrar tareas completadas
+DELIMITER //
+
+CREATE PROCEDURE LimpiarTareasAntiguas()
+BEGIN
+    -- Elimina las tareas completadas y su fecha límite pasó hace más de 30 días
+    DELETE FROM Tareas 
+    WHERE estado = 'completada' 
+    AND fechaLimite < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+END //
+
+DELIMITER ;

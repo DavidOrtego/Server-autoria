@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 let config = {};
-let swaggerConfig = {};
+let swaggerDocument = {};
 
 try {
   const swaggerPath = path.join(__dirname, "../../docs/api/openapi.yaml");

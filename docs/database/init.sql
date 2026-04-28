@@ -57,15 +57,15 @@ CREATE TABLE IF NOT EXISTS Expenses (
     FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE RESTRICT
 );
 
--- TABLA: Deudas
-CREATE TABLE IF NOT EXISTS Deudas (
-    id_deuda INT AUTO_INCREMENT PRIMARY KEY,
-    id_gasto INT NOT NULL,
-    id_usuario INT NOT NULL, 
-    cantidad DECIMAL(10, 2) NOT NULL, 
-    pagado BOOLEAN DEFAULT FALSE,   
-    FOREIGN KEY (id_gasto) REFERENCES Gastos(id_gasto) ON DELETE CASCADE,
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE RESTRICT
+-- TABLE: Debts
+CREATE TABLE IF NOT EXISTS Debts (
+    id_debt INT AUTO_INCREMENT PRIMARY KEY,
+    id_expense INT NOT NULL,
+    id_user INT NOT NULL, 
+    amount DECIMAL(10, 2) NOT NULL, 
+    paid BOOLEAN DEFAULT FALSE,   
+    FOREIGN KEY (id_expense) REFERENCES Expenses(id_expense) ON DELETE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE RESTRICT
 );
 
 -- PROCEDIMIENTO ALMACENADO: Borrar tareas completadas

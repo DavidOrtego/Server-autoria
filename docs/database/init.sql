@@ -45,16 +45,16 @@ CREATE TABLE IF NOT EXISTS Tasks (
     FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE SET NULL
 );
 
--- TABLA: Gastos
-CREATE TABLE IF NOT EXISTS Gastos (
-    id_gasto INT AUTO_INCREMENT PRIMARY KEY,
-    cantidad DECIMAL(10, 2) NOT NULL,
-    descripcion VARCHAR(255) NOT NULL,
-    fecha DATE NOT NULL,
-    id_usuario INT NOT NULL, 
-    id_piso INT NOT NULL,    
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE RESTRICT,
-    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE RESTRICT
+-- TABLE: Expenses
+CREATE TABLE IF NOT EXISTS Expenses (
+    id_expense INT AUTO_INCREMENT PRIMARY KEY,
+    amount DECIMAL(10, 2) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    id_user INT NOT NULL, 
+    id_house INT NOT NULL,    
+    FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE RESTRICT,
+    FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE RESTRICT
 );
 
 -- TABLA: Deudas

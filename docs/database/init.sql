@@ -2,7 +2,7 @@
 CREATE DATABASE IF NOT EXISTS vives_db;
 USE vives_db;
 
--- TABLA: Usuarios
+-- TABLE: Users
 CREATE TABLE IF NOT EXISTS Users (
     id_usur INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -12,15 +12,14 @@ CREATE TABLE IF NOT EXISTS Users (
     image VARCHAR(255)
 );
 
--- TABLA: Pisos
-CREATE TABLE IF NOT EXISTS Pisos (
-    id_piso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    direccion VARCHAR(255),
-    numeroHabitaciones INT,
-    foto VARCHAR(255),
-    nivel INT DEFAULT 1,
-    experiencia INT DEFAULT 0,
+-- TABLE: Houses
+CREATE TABLE IF NOT EXISTS Houses (
+    id_house INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    number_of_rooms INT,
+    image VARCHAR(255),
+    level INT DEFAULT 1,
 );
 
 -- TABLA: MiembrosPiso

@@ -22,14 +22,14 @@ CREATE TABLE IF NOT EXISTS Houses (
     level INT DEFAULT 1,
 );
 
--- TABLA: MiembrosPiso
-CREATE TABLE IF NOT EXISTS MiembrosPiso (
-    id_membresia INT AUTO_INCREMENT PRIMARY KEY,
-    id_piso INT NOT NULL,
-    id_usuario INT NOT NULL,
-    fecha_union TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE CASCADE,
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
+-- TABLE: HouseMembers
+CREATE TABLE IF NOT EXISTS HouseMembers (
+    id_membership INT AUTO_INCREMENT PRIMARY KEY,
+    id_house INT NOT NULL,
+    id_user INT NOT NULL,
+    join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE CASCADE
 );
 
 -- TABLA: Tareas

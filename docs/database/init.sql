@@ -4,11 +4,11 @@ USE vives_db;
 
 -- TABLE: Users
 CREATE TABLE IF NOT EXISTS Users (
-    id_usur INT AUTO_INCREMENT PRIMARY KEY,
+    id_user INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'miembro') DEFAULT 'miembro',
+    rol ENUM('admin', 'member') DEFAULT 'member',
     image VARCHAR(255)
 );
 

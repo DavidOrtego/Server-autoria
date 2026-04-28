@@ -32,17 +32,17 @@ CREATE TABLE IF NOT EXISTS HouseMembers (
     FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE CASCADE
 );
 
--- TABLA: Tareas
-CREATE TABLE IF NOT EXISTS Tareas (
-    id_tarea INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion VARCHAR(255),
-    estado ENUM('pendiente', 'en_progreso', 'completada') DEFAULT 'pendiente',
-    fechaLimite DATE,
-    id_piso INT NOT NULL,
-    id_usuario INT,
-    FOREIGN KEY (id_piso) REFERENCES Pisos(id_piso) ON DELETE RESTRICT,
-    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE SET NULL
+-- TABLE: Tasks
+CREATE TABLE IF NOT EXISTS Tasks (
+    id_task INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    state ENUM('pending', 'en_progreso', 'completada') DEFAULT 'pending',
+    expiration_date DATE,
+    id_house INT NOT NULL,
+    id_user INT,
+    FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE RESTRICT,
+    FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE SET NULL
 );
 
 -- TABLA: Gastos

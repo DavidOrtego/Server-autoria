@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS Tasks (
     id_task INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    state ENUM('pending', 'en_progreso', 'completada') DEFAULT 'pending',
+    state ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
     expiration_date DATE,
     id_house INT NOT NULL,
     id_user INT,
@@ -71,12 +71,12 @@ CREATE TABLE IF NOT EXISTS Debts (
 -- PROCEDIMIENTO ALMACENADO: Borrar tareas completadas
 DELIMITER //
 
-CREATE PROCEDURE LimpiarTareasAntiguas()
+CREATE PROCEDURE DeleteCompletedTasks()
 BEGIN
     -- Elimina las tareas completadas y su fecha límite pasó hace más de 30 días
-    DELETE FROM Tareas 
-    WHERE estado = 'completada' 
-    AND fechaLimite < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+    DELETE FROM Tasks 
+    WHERE state = 'completed' 
+    AND expiration_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
 END //
 
 DELIMITER ;

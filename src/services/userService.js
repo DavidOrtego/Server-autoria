@@ -19,3 +19,13 @@ const findUserById = async (userId) => {
   }
   return user;
 };
+
+/**
+ * Obtiene todos los usuarios de la base de datos
+ * @returns {Promise<Object>} Objeto con todos los usuarios
+ */
+const findAllUsers = async () => {
+  return db("Users").select("id_user", "name", "email", "rol", "image");
+};
+
+

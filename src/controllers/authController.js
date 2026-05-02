@@ -46,6 +46,28 @@ class AuthController {
       next(error);
     }
   }
+
+  /**
+   * Refresca los tokens de autenticación.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async refreshToken(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      const tokens = await authService.refreshToken(refreshToken);
+
+      res.status(200).json({
+        success: true,
+        message: "Tokens refrescados correctamente",
+        data: tokens,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
  /**
    * Cambia la contraseña de un usuario.
    * @param {Object} req - Request object.

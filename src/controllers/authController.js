@@ -46,5 +46,32 @@ class AuthController {
       next(error);
     }
   }
+ /**
+   * Cambia la contraseña de un usuario.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async changePassword(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { oldPassword, newPassword } = req.body;
+      const result = await authService.changePassword(
+        userId,
+        oldPassword,
+        newPassword,
+      );
+
+
+      res.status(200).json({
+        success: true,
+        message: "Contraseña cambiada correctamente",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
 };

@@ -28,4 +28,33 @@ const findAllUsers = async () => {
   return db("Users").select("id_user", "name", "email", "rol", "image");
 };
 
+/**
+ * Actualiza los datos de un usuario
+ * @param {number} userId - ID del usuario a actualizar
+ * @param {Object} userData - Datos del usuario a actualizar
+ * @returns {Promise<Object>} Objeto con el usuario actualizado
+ */
+const updateUser = async (userId, userData) => {
+  await findUserById(userId); // Verifica si existe, tira 404 si no
+
+
+  const updateData = {};
+  if (userData.name) updateData.name = userData.name;
+  if (userData.email) updateData.email = userData.email;
+  if (userData.rol) updateData.rol = userData.rol;
+  if (userData.image) updateData.image = userData.image;
+
+
+  if (userData.password) {
+    updateData.password = await hashPassword(userData.password);
+  }
+
+
+  if (Object.keys(updateData).length > 0) {
+    await db("Users").where({ id_user: userId }).update(updateData);
+  }
+
+
+  return findUserById(userId);
+};
 

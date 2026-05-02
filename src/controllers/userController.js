@@ -87,3 +87,39 @@ const putUser = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Elimina un usuario
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 si el usuario ha sido eliminado, o 404 si no encuentra el usuario
+ */
+const deleteUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const deletedUser = await deleteUser(userId);
+    if (deletedUser === 0) {
+      return res.status(404).json({
+        code: 404,
+        title: "Not Found",
+        message: `Usuario con id ${userId} no encontrado`,
+      });
+    }
+    res.status(200).json({
+      code: 200,
+      title: "Success",
+      message: `Usuario con id ${userId} eliminado correctamente`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+module.exports = {
+  getAllUsers,
+  getUserById,
+  putUser,
+  deleteUser,
+};

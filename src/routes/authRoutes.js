@@ -31,3 +31,20 @@ router.post(
   handleValidationErrors,
   authController.registerUser,
 );
+
+// Ruta para login
+router.post(
+  "/login",
+  loginValidators,
+  handleValidationErrors,
+  authController.loginUser,
+);
+
+
+// Ruta para refrescar token
+router.post(
+  "/refresh-token",
+  refreshTokenValidators,
+  handleValidationErrors,
+  authController.refreshToken,
+);

@@ -95,4 +95,27 @@ class AuthController {
     }
   }
 
-};
+  /**
+   * Obtiene los datos del usuario autenticado.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async me(req, res, next) {
+    try {
+      res.status(200).json({
+        success: true,
+        data: {
+          id: req.user.id,
+          email: req.user.email,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+
+module.exports = new AuthController();

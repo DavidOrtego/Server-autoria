@@ -1,17 +1,38 @@
 const express = require("express");
 const cors = require("cors");
-// const usuariosRoutes = require('./routes/usuarios'); cuando se añada routes/usurios quitar comentarios
+
+// Importar nuestras rutas
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+
+// Importar los manejadores de errores globales
+const { errorHandler, notFound } = require("./middlewares/errorHandler");
 
 const app = express();
 
+// Middlewares base
 app.use(cors());
 app.use(express.json());
 
-// Rutas
-// app.use('/api/usuarios', usuariosRoutes);
+// -----------------------------------------
+// RUTAS PRINCIPALES
+// -----------------------------------------
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
+// Ruta de prueba (Ping)
 app.get("/api/ping", (req, res) => {
   res.json({ mensaje: "¡Pong! El servidor de Vives está vivo." });
 });
+
+// -----------------------------------------
+// MANEJO DE ERRORES (Siempre va al final)
+// -----------------------------------------
+
+// 1. Si la petición no coincide con ninguna ruta de arriba, es un 404
+app.use(notFound);
+
+// 2. Si ocurre cualquier error en tu código (los next(error)), caerá aquí
+app.use(errorHandler);
 
 module.exports = app;

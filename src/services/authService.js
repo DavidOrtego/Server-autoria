@@ -56,4 +56,38 @@ class AuthService {
 
         return { user, tokens };
     }
+
+    /**
+     * Inicia sesión y genera tokens
+     * @param {string} email - Correo electrónico del usuario
+     * @param {string} password - Contraseña del usuario
+     * @returns {Promise<Object>} Objeto con usuario y tokens
+     */
+    async loginUser(email, password){
+        //comprobar si existe si existe el email
+        const user = await db("Users").where({"email": email}).first();
+        if(!user){
+            throw { status: 404, message: "Usuario no encontrado"}
+        }
+
+
+        //comprobar la contraseña
+        const isPasswordOk = await comparePassword(password, user.password);
+        if(!isPasswordOk){
+            throw { status: 401, message: "Contraseña incorrecta"}
+        }
+
+
+        // Eliminar contraseña del objeto usuario
+        const { password: _, ...userWithoutPassword } = user;
+
+
+        // Crear token para el usuario
+        const tokens = generateTokens(user);
+
+
+        // Devolver usuario y tokens
+        return { user: userWithoutPassword, tokens };
+    }
+
   };

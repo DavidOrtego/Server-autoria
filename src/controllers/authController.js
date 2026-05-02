@@ -73,5 +73,26 @@ class AuthController {
       next(error);
     }
   }
+  /**
+   * Solicita el reseteo de la contraseña.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+ async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      const result = await authService.requestPasswordReset(email);
+
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
 };

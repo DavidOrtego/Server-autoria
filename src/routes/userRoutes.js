@@ -25,3 +25,6 @@ router.use(authenticateToken);
 // GET /users -> Obtiene todos los usuarios
 // isAdmin para que solo el usuario administrador pueda acceder
 router.get("/", isAdmin, userController.getAllUsers);
+
+// GET /users/:userId -> Obtiene la información de un usuario específico
+router.get("/:userId", userIdValidator, handleValidationErrors, userController.getUserById);

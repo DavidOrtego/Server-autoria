@@ -54,3 +54,36 @@ const getUserById = async (req, res, next) => {
     next(error);
   }
 };
+
+// El post de usuarios esta en el authController porque es un recurso publico
+
+/**
+ * Actualiza un usuario
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos actualizados, o 404 si no se encuentra el usuario.
+ */
+const putUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const userData = req.body;
+    await updateUser(userId, userData);
+    const updatedUser = await findUserById(userId);
+    if (!updatedUser) {
+      return res.status(404).json({
+        code: 404,
+        title: "Not Found",
+        message: `Usuario con id ${userId} no encontrado`,
+      });
+    }
+    res.status(200).json({
+      code: 200,
+      title: "Success",
+      message: `Usuario con id ${userId} actualizado correctamente`,
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -62,3 +62,48 @@ const refreshTokenValidators = [
         .isJWT()
         .withMessage("El refresh token debe ser un token JWT válido.")
 ];
+
+const changePasswordValidators = [
+    body("oldPassword")
+        .trim()
+        .notEmpty()
+        .withMessage("La contraseña anterior es requerida.")
+        .isLength({ min: 8 })
+        .withMessage("La contraseña debe tener al menos 8 caracteres."),
+
+
+    body("newPassword")
+        .trim()
+        .notEmpty()
+        .withMessage("La nueva contraseña es requerida.")
+        .isLength({ min: 8 })
+        .withMessage("La nueva contraseña debe tener al menos 8 caracteres."),
+
+
+    body("confirmPassword")
+        .trim()
+        .notEmpty()
+        .withMessage("La confirmación de la contraseña es requerida.")
+        .custom((value, { req }) => confirmPassword(value, req.body.newPassword)),
+];
+
+
+const forgotPasswordValidators = [
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("El correo electrónico es requerido.")
+        .isEmail()
+        .withMessage("Debe ser un correo electrónico válido.")
+        .isLength({ max: 150 })
+        .withMessage("El correo electrónico no puede exceder los 150 caracteres."),
+];
+
+
+module.exports = {
+    registerValidators,
+    loginValidators,
+    refreshTokenValidators,
+    changePasswordValidators,
+    forgotPasswordValidators,
+};

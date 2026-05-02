@@ -28,3 +28,12 @@ router.get("/", isAdmin, userController.getAllUsers);
 
 // GET /users/:userId -> Obtiene la información de un usuario específico
 router.get("/:userId", userIdValidator, handleValidationErrors, userController.getUserById);
+
+// PUT /users/:userId -> Actualiza la información de un usuario
+router.put(
+  "/:userId",
+  userIdValidator,
+  putUserValidator,
+  handleValidationErrors,
+  userController.putUser
+);

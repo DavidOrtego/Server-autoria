@@ -37,3 +37,10 @@ router.put(
   handleValidationErrors,
   userController.putUser
 );
+
+// DELETE /users/:userId -> Elimina un usuario
+// isAdmin para que solo el usuario administrador pueda eliminar a otro usuario
+router.delete("/:userId", isAdmin, userIdValidator, handleValidationErrors, userController.deleteAUser);
+
+
+module.exports = router;

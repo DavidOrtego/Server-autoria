@@ -53,3 +53,12 @@ const loginValidators = [
         .isLength({ min: 8 })
         .withMessage("La contraseña debe tener al menos 8 caracteres."),
 ];
+
+const refreshTokenValidators = [
+    body("refreshToken")
+        .trim()
+        .notEmpty()
+        .withMessage("El refresh token es requerido.")
+        .isJWT()
+        .withMessage("El refresh token debe ser un token JWT válido.")
+];

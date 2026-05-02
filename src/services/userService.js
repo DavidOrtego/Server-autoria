@@ -58,3 +58,21 @@ const updateUser = async (userId, userData) => {
   return findUserById(userId);
 };
 
+/**
+ * Elimina un usuario de la base de datos
+ * @param {number} userId - ID del usuario a eliminar
+ * @returns {Promise<Object>} Objeto con mensaje de confirmación
+ */
+const deleteUser = async (userId) => {
+  await findUserById(userId); // Verifica si existe, tira 404 si no
+  await db("Users").where({ id_user: userId }).del();
+  return { message: "Usuario eliminado correctamente" };
+};
+
+
+module.exports = {
+  findUserById,
+  findAllUsers,
+  updateUser,
+  deleteUser,
+};

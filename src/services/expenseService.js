@@ -71,10 +71,40 @@ const deleteExpense = async (expenseId) => {
     return { message: "Gasto eliminado correctamente" };
 }
 
+const findExpensesByHouse = async (houseId) => {
+    const expenses = await db("Expenses")
+        .select(
+            "id_expense",
+            "amount",
+            "description",
+            "date",
+            "id_user",
+            "id_house"
+        )
+        .where({ id_house: houseId });
+    return expenses;
+}
+
+const findExpensesByUser = async (userId) => {
+    const expenses = await db("Expenses")
+        .select(
+            "id_expense",
+            "amount",
+            "description",
+            "date",
+            "id_user",
+            "id_house"
+        )
+        .where({ id_user: userId });
+    return expenses;
+}
+
 module.exports = {
     findAllExpenses,
     findExpenseById,
     createExpense,
     updateExpense,
     deleteExpense,
+    findExpensesByHouse,
+    findExpensesByUser,
 }

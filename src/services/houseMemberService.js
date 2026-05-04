@@ -77,3 +77,28 @@ const addMemberToHouse = async (houseId, userId) => {
     
     return id;
 };
+/**
+ * Elimina un usuario de una casa
+ * @param {number} houseId - ID de la casa
+ * @param {number} userId - ID del usuario
+ * @returns {Promise<Object>} Objeto con el número de registros eliminados
+ */
+const removeMemberFromHouse = async (houseId, userId) => {
+    const deletedCount = await db("HouseMembers")
+        .where({ id_house: houseId, id_user: userId })
+        .del();
+    
+    if (deletedCount === 0) {
+        throw { status: 404, message: "No se encontró el miembro en la casa" };
+    }
+    
+    return deletedCount;
+};
+
+module.exports = {
+    findAllHouseMembers,
+    findMembersByHouseId,
+    findHousesByUserId,
+    addMemberToHouse,
+    removeMemberFromHouse
+};

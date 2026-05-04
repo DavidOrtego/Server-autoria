@@ -18,3 +18,6 @@ router.get("/", houseController.getAllHouses);
 
 // GET /houses/:houseId -> Obtiene la información de una casa específica
 router.get("/:houseId", houseController.getHouseById);
+
+// POST /houses -> Crea una nueva casa
+router.post("/", authenticateToken, houseController.postHouse);

@@ -103,9 +103,31 @@ const putExpense = async (req, res, next) => {
     }
 };
 
+/**
+ * Elimina un gasto
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200
+ */
+const deleteAExpense = async (req, res, next) => {
+    try {
+        const { expenseId } = req.params;
+        await deleteExpense(expenseId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Gasto con id ${expenseId} eliminado correctamente`,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllExpenses,
     getExpenseById,
     postExpense,
     putExpense,
+    deleteAExpense,
 };

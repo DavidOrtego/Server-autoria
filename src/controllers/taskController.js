@@ -103,9 +103,31 @@ const putTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Elimina una tarea
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200
+ */
+const deleteATask = async (req, res, next) => {
+    try {
+        const { taskId } = req.params;
+        await deleteTask(taskId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Tarea con id ${taskId} eliminada correctamente`,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllTasks,
     getTaskById,
     postTask,
     putTask,
+    deleteATask,
 };

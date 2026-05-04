@@ -74,10 +74,42 @@ const deleteTask = async (taskId) => {
     return { message: "Tarea eliminada correctamente" };
 }
 
+const findTasksByHouse = async (houseId) => {
+    const tasks = await db("Tasks")
+        .select(
+            "id_task",
+            "name",
+            "description",
+            "state",
+            "expiration_date",
+            "id_house",
+            "id_user"
+        )
+        .where({ id_house: houseId });
+    return tasks;
+}
+
+const findTasksByUser = async (userId) => {
+    const tasks = await db("Tasks")
+        .select(
+            "id_task",
+            "name",
+            "description",
+            "state",
+            "expiration_date",
+            "id_house",
+            "id_user"
+        )
+        .where({ id_user: userId });
+    return tasks;
+}
+
 module.exports = {
     findAllTasks,
     findTaskById,
     createTask,
     updateTask,
     deleteTask,
+    findTasksByHouse,
+    findTasksByUser,
 }

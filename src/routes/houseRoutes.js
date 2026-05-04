@@ -24,3 +24,8 @@ router.post("/", authenticateToken, houseController.postHouse);
 
 // PUT /houses/:houseId -> Actualiza la información de una casa
 router.put("/:houseId", authenticateToken, houseController.putHouse);
+
+// DELETE /houses/:houseId -> Elimina una casa
+router.delete("/:houseId", authenticateToken, isAdmin, houseController.deleteAHouse);
+
+module.exports = router;

@@ -25,4 +25,22 @@ router.get("/:expenseId", expenseIdValidator, handleValidationErrors, expenseCon
 // POST /expenses -> Crea un nuevo gasto
 router.post("/", postExpenseValidator, handleValidationErrors, expenseController.postExpense);
 
+// PUT /expenses/:expenseId -> Actualiza un gasto
+router.put(
+    "/:expenseId",
+    expenseIdValidator,
+    putExpenseValidator,
+    handleValidationErrors,
+    expenseController.putExpense
+);
+
+// DELETE /expenses/:expenseId -> Elimina un gasto
+router.delete("/:expenseId", expenseIdValidator, handleValidationErrors, expenseController.deleteAExpense);
+
+// GET /expenses/house/:houseId -> Obtiene los gastos de una casa
+router.get("/house/:houseId", expenseController.getExpensesByHouse);
+
+// GET /expenses/user/:userId -> Obtiene los gastos de un usuario
+router.get("/user/:userId", expenseController.getExpensesByUser);
+
 module.exports = router;

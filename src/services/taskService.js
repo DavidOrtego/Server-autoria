@@ -34,7 +34,13 @@ const findTaskById = async (taskId) => {
     return task;
 }
 
+const createTask = async (taskData) => {
+    const [id] = await db("Tasks").insert(taskData);
+    return id;
+}
+
 module.exports = {
     findAllTasks,
     findTaskById,
+    createTask,
 }

@@ -78,8 +78,34 @@ const postExpense = async (req, res, next) => {
     }
 };
 
+/**
+ * Actualiza un gasto existente
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos actualizados
+ */
+const putExpense = async (req, res, next) => {
+    try {
+        const { expenseId } = req.params;
+        const expenseData = req.body;
+        await updateExpense(expenseId, expenseData);
+        const updatedExpense = await findExpenseById(expenseId);
+
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Gasto con id ${expenseId} actualizado correctamente`,
+            data: updatedExpense,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllExpenses,
     getExpenseById,
     postExpense,
+    putExpense,
 };

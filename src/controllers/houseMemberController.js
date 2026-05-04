@@ -92,3 +92,37 @@ const postHouseMember = async (req, res, next) => {
     }
 }
 
+/**
+ * Elimina un usuario de una casa
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos si es correcto, 404 si no se encuentra el usuario o la casa.
+ */
+const deleteHouseMember = async (req, res, next) => {
+    try {
+        const { id_house, id_user } = req.params;
+        const houseMember = await removeMemberFromHouse(id_house, id_user);
+        if (!houseMember) {
+            return res.status(404).json({
+                code: 404,
+                title: "Not Found",
+                message: `No se pudo eliminar el usuario de la casa`,
+            });
+        }
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Usuario con id ${id_user} eliminado de la casa con id ${id_house} correctamente`,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = {
+    getMembersByHouseId,
+    getHousesByUserId,
+    postHouseMember,
+    deleteHouseMember,
+};

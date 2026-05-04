@@ -124,10 +124,48 @@ const deleteAExpense = async (req, res, next) => {
     }
 };
 
+/**
+ * Obtiene los gastos de una casa específica
+ */
+const getExpensesByHouse = async (req, res, next) => {
+    try {
+        const { houseId } = req.params;
+        const expenses = await findExpensesByHouse(houseId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Gastos de la casa ${houseId} obtenidos correctamente`,
+            data: expenses,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Obtiene los gastos de un usuario específico
+ */
+const getExpensesByUser = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const expenses = await findExpensesByUser(userId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Gastos del usuario ${userId} obtenidos correctamente`,
+            data: expenses,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllExpenses,
     getExpenseById,
     postExpense,
     putExpense,
     deleteAExpense,
+    getExpensesByHouse,
+    getExpensesByUser,
 };

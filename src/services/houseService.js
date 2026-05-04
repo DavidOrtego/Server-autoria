@@ -70,3 +70,22 @@ const updateHouse = async (houseId, newHouseData) => {
     }
 }
 
+const deleteHouse = async (houseId) => {
+    const existingHouse = await db("Houses")
+        .where({ id_house: houseId })
+        .first();
+    if (!existingHouse) {
+        throw { status: 404, message: "Casa no encontrada" }
+    }
+    await db("Houses").where({ id_house: houseId }).del();
+    return { message: "Casa eliminada correctamente" };
+}
+
+module.exports = {
+    findAllHouses,
+    findHouseById,
+    createHouse,
+    updateHouse,
+    deleteHouse,
+}
+

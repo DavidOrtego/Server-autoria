@@ -50,3 +50,23 @@ const createHouse = async (houseData) => {
             "level"
         ]);
 }
+
+const updateHouse = async (houseId, newHouseData) => {
+    const existingHouse = await db ("Houses")
+        .where({id_house: houseId})
+        .first();
+    if (!existingHouse) {
+        throw {status: 404, message: "Casa no encontrada"}
+    }
+    const updateData = {};
+    if (newHouseData.name) updateData.name = newHouseData.name;
+    if (newHouseData.address) updateData.address = newHouseData.address;
+    if (newHouseData.number_of_rooms) updateData.number_of_rooms = newHouseData.number_of_rooms;
+    if (newHouseData.image) updateData.image = newHouseData.image;
+    if (newHouseData.level) updateData.level = newHouseData.level;
+
+    if (Object.keys(updateData).length > 0) {
+        await db("Houses").where({ id_house: houseId }).update(updateData);
+    }
+}
+

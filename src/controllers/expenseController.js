@@ -51,7 +51,35 @@ const getExpenseById = async (req, res, next) => {
     }
 };
 
+/**
+ * Crea un nuevo gasto
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 201 y el gasto creado
+ */
+const postExpense = async (req, res, next) => {
+    try {
+        const expenseData = req.body;
+        const newId = await createExpense(expenseData);
+        const newExpense = {
+            id_expense: newId,
+            ...expenseData,
+        };
+
+        res.status(201).json({
+            code: 201,
+            title: "Created",
+            message: `Gasto con id ${newId} creado correctamente`,
+            data: newExpense,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllExpenses,
     getExpenseById,
+    postExpense,
 };

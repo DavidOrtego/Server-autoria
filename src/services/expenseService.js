@@ -32,7 +32,13 @@ const findExpenseById = async (expenseId) => {
     return expense;
 }
 
+const createExpense = async (expenseData) => {
+    const [id] = await db("Expenses").insert(expenseData);
+    return id;
+}
+
 module.exports = {
     findAllExpenses,
     findExpenseById,
+    createExpense,
 }

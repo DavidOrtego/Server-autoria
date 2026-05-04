@@ -114,3 +114,38 @@ const putHouse = async (req, res, next) => {
   }
 };
 
+/**
+ * Elimina una casa
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 si la casa ha sido eliminada, o 404 si no encuentra la casa
+ */
+const deleteHouse = async (req, res, next) => {
+  try {
+    const { houseId } = req.params;
+    const deletedHouse = await deleteHouse(houseId);
+    if (deletedHouse === 0) {
+      res.status(404).json({
+        code: 404,
+        title: "Not Found",
+        message: `Casa con id ${houseId} no encontrada`,
+      });
+    }
+    res.status(200).json({
+      code: 200,
+      title: "Success",
+      message: `Casa con id ${houseId} eliminada correctamente`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getAllHouses,
+  getHouseById,
+  postHouse,
+  putHouse,
+  deleteHouse,
+};

@@ -124,10 +124,48 @@ const deleteATask = async (req, res, next) => {
     }
 };
 
+/**
+ * Obtiene las tareas de una casa específica
+ */
+const getTasksByHouse = async (req, res, next) => {
+    try {
+        const { houseId } = req.params;
+        const tasks = await findTasksByHouse(houseId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Tareas de la casa ${houseId} obtenidas correctamente`,
+            data: tasks,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Obtiene las tareas de un usuario específico
+ */
+const getTasksByUser = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const tasks = await findTasksByUser(userId);
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Tareas del usuario ${userId} obtenidas correctamente`,
+            data: tasks,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllTasks,
     getTaskById,
     postTask,
     putTask,
     deleteATask,
+    getTasksByHouse,
+    getTasksByUser,
 };

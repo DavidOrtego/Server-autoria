@@ -62,3 +62,33 @@ const getHousesByUserId = async (req, res, next) => {
         next(error);
     }
 }
+
+/**
+ * Agrega un nuevo usuario a una casa
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos si es correcto, 404 si no se encuentra el usuario o la casa.
+ */
+const postHouseMember = async (req, res, next) => {
+    try {
+        const { id_house, id_user } = req.body;
+        const houseMember = await addMemberToHouse(id_house, id_user);
+        if (!houseMember) {
+            return res.status(404).json({
+                code: 404,
+                title: "Not Found",
+                message: `No se pudo agregar el usuario a la casa`,
+            });
+        }
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Usuario agregado a la casa correctamente`,
+            data: houseMember,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+

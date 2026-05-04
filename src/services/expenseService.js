@@ -58,9 +58,23 @@ const updateExpense = async (expenseId, newExpenseData) => {
     }
 }
 
+const deleteExpense = async (expenseId) => {
+    const existingExpense = await db("Expenses")
+        .where({ id_expense: expenseId })
+        .first();
+    
+    if (!existingExpense) {
+        throw { status: 404, message: "Gasto no encontrado" };
+    }
+    
+    await db("Expenses").where({ id_expense: expenseId }).del();
+    return { message: "Gasto eliminado correctamente" };
+}
+
 module.exports = {
     findAllExpenses,
     findExpenseById,
     createExpense,
     updateExpense,
+    deleteExpense,
 }

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Importamos el controlador de houses
-const houseController = require("../controllers/housesController");
+const houseController = require("../controllers/houseController");
 
 // Importamos los middlewares de seguridad
 const { authenticateToken, isAdmin } = require("../middlewares/authMiddleware");
@@ -26,6 +26,11 @@ router.post("/", authenticateToken, houseController.postHouse);
 router.put("/:houseId", authenticateToken, houseController.putHouse);
 
 // DELETE /houses/:houseId -> Elimina una casa
-router.delete("/:houseId", authenticateToken, isAdmin, houseController.deleteAHouse);
+router.delete(
+  "/:houseId",
+  authenticateToken,
+  isAdmin,
+  houseController.deleteAHouse,
+);
 
 module.exports = router;

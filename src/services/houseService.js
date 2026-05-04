@@ -1,7 +1,7 @@
 const { db } = require("../config/database");
 
 const findAllHouses = async () => {
-    const house = await db("Houses").select(
+    const houses = await db("Houses").select(
         "id_house",
         "name",
         "address",
@@ -9,6 +9,7 @@ const findAllHouses = async () => {
         "image",
         "level"
     );
+    return houses;
 }
 
 const findHouseById = async (houseId) => {
@@ -39,24 +40,16 @@ const createHouse = async (houseData) => {
         throw { status: 400, message: "La casa ya existe" };
     }
 
-    const [createdHouse] = await db("Houses")
-        .insert(houseData)
-        .returning([
-            "id_house",
-            "name",
-            "address",
-            "number_of_rooms",
-            "image",
-            "level"
-        ]);
+    const [newId] = await db("Houses").insert(houseData);
+    return newId;
 }
 
 const updateHouse = async (houseId, newHouseData) => {
-    const existingHouse = await db ("Houses")
-        .where({id_house: houseId})
+    const existingHouse = await db("Houses")
+        .where({ id_house: houseId })
         .first();
     if (!existingHouse) {
-        throw {status: 404, message: "Casa no encontrada"}
+        throw { status: 404, message: "Casa no encontrada" }
     }
     const updateData = {};
     if (newHouseData.name) updateData.name = newHouseData.name;
@@ -77,8 +70,8 @@ const deleteHouse = async (houseId) => {
     if (!existingHouse) {
         throw { status: 404, message: "Casa no encontrada" }
     }
-    await db("Houses").where({ id_house: houseId }).del();
-    return { message: "Casa eliminada correctamente" };
+    const deletedCount = await db("Houses").where({ id_house: houseId }).del();
+    return deletedCount;
 }
 
 module.exports = {
@@ -88,4 +81,3 @@ module.exports = {
     updateHouse,
     deleteHouse,
 }
-

@@ -53,3 +53,27 @@ const findHousesByUserId = async (userId) => {
     
     return houses;
 };
+
+/**
+ * Añade un usuario a una casa
+ * @param {number} houseId - ID de la casa
+ * @param {number} userId - ID del usuario
+ * @returns {Promise<Object>} Objeto con el ID de la membresía
+ */
+const addMemberToHouse = async (houseId, userId) => {
+    // Verificar si ya es miembro para evitar duplicados
+    const existing = await db("HouseMembers")
+        .where({ id_house: houseId, id_user: userId })
+        .first();
+    
+    if (existing) {
+        throw { status: 400, message: "El usuario ya es miembro de esta casa" };
+    }
+
+    const [id] = await db("HouseMembers").insert({
+        id_house: houseId,
+        id_user: userId
+    });
+    
+    return id;
+};

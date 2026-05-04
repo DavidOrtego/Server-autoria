@@ -81,3 +81,36 @@ const postHouse = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Actualiza una casa
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos actualizados
+ */
+const putHouse = async (req, res, next) => {
+  try {
+    const { houseId } = req.params;
+    const houseData = req.body;
+    await updateHouse(houseId, houseData);
+    const updatedHouse = await findHouseById(houseId);
+    if (!updatedHouse) {
+      res.status(404).json({
+        code: 404,
+        title: "Not Found",
+        message: `Casa con id ${houseId} no encontrada`,
+      });
+    }
+
+    res.status(200).json({
+      code: 200,
+      title: "Success",
+      message: `Casa con id ${houseId} actualizada correctamente`,
+      data: updatedHouse,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

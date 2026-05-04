@@ -21,3 +21,6 @@ router.get("/:houseId", houseController.getHouseById);
 
 // POST /houses -> Crea una nueva casa
 router.post("/", authenticateToken, houseController.postHouse);
+
+// PUT /houses/:houseId -> Actualiza la información de una casa
+router.put("/:houseId", authenticateToken, houseController.putHouse);

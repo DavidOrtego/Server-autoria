@@ -61,9 +61,23 @@ const updateTask = async (taskId, newTaskData) => {
     }
 }
 
+const deleteTask = async (taskId) => {
+    const existingTask = await db("Tasks")
+        .where({ id_task: taskId })
+        .first();
+    
+    if (!existingTask) {
+        throw { status: 404, message: "Tarea no encontrada" };
+    }
+    
+    await db("Tasks").where({ id_task: taskId }).del();
+    return { message: "Tarea eliminada correctamente" };
+}
+
 module.exports = {
     findAllTasks,
     findTaskById,
     createTask,
     updateTask,
+    deleteTask,
 }

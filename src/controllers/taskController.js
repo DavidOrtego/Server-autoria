@@ -78,8 +78,34 @@ const postTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Actualiza una tarea existente
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 200 y los datos actualizados
+ */
+const putTask = async (req, res, next) => {
+    try {
+        const { taskId } = req.params;
+        const taskData = req.body;
+        await updateTask(taskId, taskData);
+        const updatedTask = await findTaskById(taskId);
+
+        res.status(200).json({
+            code: 200,
+            title: "Success",
+            message: `Tarea con id ${taskId} actualizada correctamente`,
+            data: updatedTask,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllTasks,
     getTaskById,
     postTask,
+    putTask,
 };

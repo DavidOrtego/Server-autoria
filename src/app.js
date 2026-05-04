@@ -6,6 +6,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const houseRoutes = require("./routes/houseRoutes");
 
+const taskRoutes = require("./routes/taskRoutes");
+
 // Importar los manejadores de errores globales
 const { errorHandler, notFound } = require("./middlewares/errorHandler");
 
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/houses", houseRoutes);
+
+app.use("/api/tasks", taskRoutes);
 
 // Ruta de prueba (Ping)
 app.get("/api/ping", (req, res) => {

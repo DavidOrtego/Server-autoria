@@ -25,4 +25,22 @@ router.get("/:taskId", taskIdValidator, handleValidationErrors, taskController.g
 // POST /tasks -> Crea una nueva tarea
 router.post("/", postTaskValidator, handleValidationErrors, taskController.postTask);
 
+// PUT /tasks/:taskId -> Actualiza una tarea
+router.put(
+    "/:taskId",
+    taskIdValidator,
+    putTaskValidator,
+    handleValidationErrors,
+    taskController.putTask
+);
+
+// DELETE /tasks/:taskId -> Elimina una tarea
+router.delete("/:taskId", taskIdValidator, handleValidationErrors, taskController.deleteATask);
+
+// GET /tasks/house/:houseId -> Obtiene las tareas de una casa
+router.get("/house/:houseId", taskController.getTasksByHouse);
+
+// GET /tasks/user/:userId -> Obtiene las tareas de un usuario
+router.get("/user/:userId", taskController.getTasksByUser);
+
 module.exports = router;

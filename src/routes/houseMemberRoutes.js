@@ -35,3 +35,25 @@ router.get(
     handleValidationErrors,
     houseMemberController.getHousesByUserId
 );
+
+// Añadir un miembro a una casa
+// POST /api/house-members
+router.post(
+    "/",
+    postHouseMemberValidator,
+    handleValidationErrors,
+    houseMemberController.postHouseMember
+);
+
+// Eliminar un miembro de una casa
+// DELETE /api/house-members/house/:id_house/user/:id_user
+router.delete(
+    "/house/:id_house/user/:id_user",
+    idHouseParamValidator,
+    idUserParamValidator,
+    handleValidationErrors,
+    houseMemberController.deleteHouseMember
+);
+
+module.exports = router;
+

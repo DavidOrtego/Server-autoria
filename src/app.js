@@ -8,6 +8,8 @@ const houseRoutes = require("./routes/houseRoutes");
 const houseMemberRoutes = require("./routes/houseMemberRoutes");
 
 
+const taskRoutes = require("./routes/taskRoutes");
+
 // Importar los manejadores de errores globales
 const { errorHandler, notFound } = require("./middlewares/errorHandler");
 
@@ -25,6 +27,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/houses", houseRoutes);
 app.use("/api/house-members", houseMemberRoutes);
 
+
+app.use("/api/tasks", taskRoutes);
 
 // Ruta de prueba (Ping)
 app.get("/api/ping", (req, res) => {

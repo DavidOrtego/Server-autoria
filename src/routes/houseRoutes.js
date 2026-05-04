@@ -1,0 +1,20 @@
+const express = require("express");
+const router = express.Router();
+
+// Importamos el controlador de houses
+const houseController = require("../controllers/housesController");
+
+// Importamos los middlewares de seguridad
+const { authenticateToken, isAdmin } = require("../middlewares/authMiddleware");
+
+// Verificar que hay un usuario logueado y guardar los datos en req.user
+// (Descomenta la siguiente línea si quieres que todas las rutas de houses requieran autenticación)
+// router.use(authenticateToken);
+
+// RUTAS DE HOUSES
+
+// GET /houses -> Obtiene todas las casas
+router.get("/", houseController.getAllHouses);
+
+// GET /houses/:houseId -> Obtiene la información de una casa específica
+router.get("/:houseId", houseController.getHouseById);

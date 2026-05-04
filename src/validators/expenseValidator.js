@@ -39,7 +39,38 @@ const postExpenseValidator = [
         .withMessage("El ID de la casa es obligatorio."),
 ];
 
+const putExpenseValidator = [
+    body("amount")
+        .optional()
+        .isDecimal({ decimal_digits: '0,2' })
+        .withMessage("El monto debe ser un número decimal válido."),
+
+    body("description")
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage("La descripción no puede estar vacía.")
+        .isLength({ max: 255 })
+        .withMessage("La descripción no puede exceder los 255 caracteres."),
+
+    body("date")
+        .optional()
+        .isISO8601()
+        .withMessage("La fecha debe ser una fecha válida (ISO8601)."),
+
+    body("id_user")
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage("El ID del usuario debe ser un número entero positivo."),
+
+    body("id_house")
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage("El ID de la casa debe ser un número entero positivo."),
+];
+
 module.exports = {
     expenseIdValidator,
     postExpenseValidator,
+    putExpenseValidator,
 };

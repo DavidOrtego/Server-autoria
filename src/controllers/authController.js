@@ -1,0 +1,143 @@
+const authService = require("../services/authService");
+
+
+class AuthController {
+  /**
+   * Registra un nuevo usuario.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async registerUser(req, res, next) {
+    try {
+      const result = await authService.registerUser(req.body);
+
+
+      res.status(201).json({
+        success: true,
+        message: "Usuario registrado correctamente",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+  /**
+   * Inicia sesión en un usuario existente.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async loginUser(req, res, next) {
+    try {
+      const { email, password } = req.body;
+      const result = await authService.loginUser(email, password);
+
+
+      res.status(200).json({
+        success: true,
+        message: "Login exitoso",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Refresca los tokens de autenticación.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async refreshToken(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      const tokens = await authService.refreshToken(refreshToken);
+
+      res.status(200).json({
+        success: true,
+        message: "Tokens refrescados correctamente",
+        data: tokens,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+ /**
+   * Cambia la contraseña de un usuario.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async changePassword(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { oldPassword, newPassword } = req.body;
+      const result = await authService.changePassword(
+        userId,
+        oldPassword,
+        newPassword,
+      );
+
+
+      res.status(200).json({
+        success: true,
+        message: "Contraseña cambiada correctamente",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  /**
+   * Solicita el reseteo de la contraseña.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+ async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      const result = await authService.requestPasswordReset(email);
+
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Obtiene los datos del usuario autenticado.
+   * @param {Object} req - Request object.
+   * @param {Object} res - Response object.
+   * @param {Function} next - Next function.
+   * @returns {Promise<void>}
+   */
+  async me(req, res, next) {
+    try {
+      res.status(200).json({
+        success: true,
+        data: {
+          id: req.user.id,
+          email: req.user.email,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+
+module.exports = new AuthController();

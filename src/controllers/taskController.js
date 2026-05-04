@@ -51,7 +51,35 @@ const getTaskById = async (req, res, next) => {
     }
 };
 
+/**
+ * Crea una nueva tarea
+ * @param {Object} req - Objeto de petición de Express.
+ * @param {Object} res - Objeto de respuesta de Express.
+ * @param {Function} next - Función middleware para manejo de errores.
+ * @returns {Promise<void>} Devuelve una respuesta JSON con código 201 y la tarea creada
+ */
+const postTask = async (req, res, next) => {
+    try {
+        const taskData = req.body;
+        const newId = await createTask(taskData);
+        const newTask = {
+            id_task: newId,
+            ...taskData,
+        };
+
+        res.status(201).json({
+            code: 201,
+            title: "Created",
+            message: `Tarea con id ${newId} creada correctamente`,
+            data: newTask,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllTasks,
     getTaskById,
+    postTask,
 };

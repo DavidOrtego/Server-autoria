@@ -16,7 +16,7 @@ const {
 const getMembersByHouseId = async (req, res, next) => {
     try {
         const { id_house } = req.params;
-        const members = await findMembersByHouseId(id_house);
+        const members = await findMembersByHouseId(id_house, req.user);
         if (!members) {
             return res.status(404).json({
                 code: 404,
@@ -44,7 +44,7 @@ const getMembersByHouseId = async (req, res, next) => {
 const getHousesByUserId = async (req, res, next) => {
     try {
         const { id_user } = req.params;
-        const houses = await findHousesByUserId(id_user);
+        const houses = await findHousesByUserId(id_user, req.user);
         if (!houses) {
             return res.status(404).json({
                 code: 404,
@@ -73,7 +73,7 @@ const getHousesByUserId = async (req, res, next) => {
 const postHouseMember = async (req, res, next) => {
     try {
         const { id_house, id_user } = req.body;
-        const houseMember = await addMemberToHouse(id_house, id_user);
+        const houseMember = await addMemberToHouse(id_house, id_user, req.user);
         if (!houseMember) {
             return res.status(404).json({
                 code: 404,
@@ -102,7 +102,7 @@ const postHouseMember = async (req, res, next) => {
 const deleteHouseMember = async (req, res, next) => {
     try {
         const { id_house, id_user } = req.params;
-        const houseMember = await removeMemberFromHouse(id_house, id_user);
+        const houseMember = await removeMemberFromHouse(id_house, id_user, req.user);
         if (!houseMember) {
             return res.status(404).json({
                 code: 404,

@@ -15,7 +15,7 @@ const {
  */
 const getAllHouses = async (req, res, next) => {
   try {
-    const houses = await findAllHouses();
+    const houses = await findAllHouses(req.user);
     res.status(200).json({
       code: 200,
       title: "Success",
@@ -36,7 +36,7 @@ const getAllHouses = async (req, res, next) => {
 const getHouseById = async (req, res, next) => {
   try {
     const { houseId } = req.params;
-    const house = await findHouseById(houseId);
+    const house = await findHouseById(houseId, req.user);
     if (!house) {
       res.status(404).json({
         code: 404,
@@ -65,7 +65,7 @@ const getHouseById = async (req, res, next) => {
 const postHouse = async (req, res, next) => {
   try {
     const houseData = req.body;
-    const newId = await createHouse(houseData);
+    const newId = await createHouse(houseData, req.user.id);
     const newHouse = {
       id_house: newId,
       ...houseData,
@@ -93,8 +93,8 @@ const putHouse = async (req, res, next) => {
   try {
     const { houseId } = req.params;
     const houseData = req.body;
-    await updateHouse(houseId, houseData);
-    const updatedHouse = await findHouseById(houseId);
+    await updateHouse(houseId, houseData, req.user);
+    const updatedHouse = await findHouseById(houseId, req.user);
     if (!updatedHouse) {
       res.status(404).json({
         code: 404,
@@ -124,7 +124,7 @@ const putHouse = async (req, res, next) => {
 const deleteAHouse = async (req, res, next) => {
   try {
     const { houseId } = req.params;
-    const deletedHouse = await deleteHouse(houseId);
+    const deletedHouse = await deleteHouse(houseId, req.user);
     if (deletedHouse === 0) {
       res.status(404).json({
         code: 404,

@@ -8,8 +8,7 @@ const houseController = require("../controllers/houseController");
 const { authenticateToken, isAdmin } = require("../middlewares/authMiddleware");
 
 // Verificar que hay un usuario logueado y guardar los datos en req.user
-// (Descomenta la siguiente línea si quieres que todas las rutas de houses requieran autenticación)
-// router.use(authenticateToken);
+router.use(authenticateToken);
 
 // RUTAS DE HOUSES
 

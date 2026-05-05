@@ -7,7 +7,12 @@ const { hashPassword } = require("../utils/encryption");
  * @param {number} userId - ID del usuario a obtener
  * @returns {Promise<Object>} Objeto con el usuario
  */
-const findUserById = async (userId) => {
+const findUserById = async (userId, requester) => {
+  // Solo admin o el propio usuario pueden ver los detalles
+  if (requester.rol !== 'admin' && parseInt(requester.id) !== parseInt(userId)) {
+      throw { status: 403, message: "No tienes permiso para acceder a esta información" };
+  }
+
   const user = await db("Users")
     .select("id_user", "name", "email", "rol", "image")
     .where({ id_user: userId })
@@ -34,14 +39,15 @@ const findAllUsers = async () => {
  * @param {Object} userData - Datos del usuario a actualizar
  * @returns {Promise<Object>} Objeto con el usuario actualizado
  */
-const updateUser = async (userId, userData) => {
-  await findUserById(userId); // Verifica si existe, tira 404 si no
+const updateUser = async (userId, userData, requester) => {
+  // Verifica si existe y si el requester tiene permiso
+  await findUserById(userId, requester); 
 
 
   const updateData = {};
   if (userData.name) updateData.name = userData.name;
   if (userData.email) updateData.email = userData.email;
-  if (userData.rol) updateData.rol = userData.rol;
+  if (userData.rol && requester.rol === 'admin') updateData.rol = userData.rol; // Solo admin cambia roles
   if (userData.image) updateData.image = userData.image;
 
 
@@ -55,7 +61,7 @@ const updateUser = async (userId, userData) => {
   }
 
 
-  return findUserById(userId);
+  return findUserById(userId, requester);
 };
 
 /**
@@ -63,8 +69,8 @@ const updateUser = async (userId, userData) => {
  * @param {number} userId - ID del usuario a eliminar
  * @returns {Promise<Object>} Objeto con mensaje de confirmación
  */
-const deleteUser = async (userId) => {
-  await findUserById(userId); // Verifica si existe, tira 404 si no
+const deleteUser = async (userId, requester) => {
+  await findUserById(userId, requester); // Verifica si existe y permiso
   await db("Users").where({ id_user: userId }).del();
   return { message: "Usuario eliminado correctamente" };
 };

@@ -52,7 +52,6 @@ router.put(
 // DELETE /houses/:houseId -> Elimina una casa
 router.delete(
   "/:houseId",
-  isAdmin,
   houseIdParamValidator,
   handleValidationErrors,
   houseController.deleteAHouse

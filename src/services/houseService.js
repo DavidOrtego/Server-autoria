@@ -1,7 +1,7 @@
 const { db } = require("../config/database");
 
-const findAllHouses = async () => {
-    const houses = await db("Houses").select(
+const findAllHouses = async (user) => {
+    let query = db("Houses").select(
         "id_house",
         "name",
         "address",
@@ -9,11 +9,18 @@ const findAllHouses = async () => {
         "image",
         "level"
     );
-    return houses;
+
+    if (user.rol !== 'admin') {
+        query = query.whereIn('id_house', function() {
+            this.select('id_house').from('HouseMembers').where('id_user', user.id);
+        });
+    }
+
+    return await query;
 }
 
-const findHouseById = async (houseId) => {
-    const house = await db("Houses")
+const findHouseById = async (houseId, user) => {
+    let query = db("Houses")
         .select(
             "id_house",
             "name",
@@ -22,35 +29,49 @@ const findHouseById = async (houseId) => {
             "image",
             "level"
         )
-        .where({ id_house: houseId })
-        .first();
+        .where({ id_house: houseId });
+
+    if (user.rol !== 'admin') {
+        query = query.whereIn('id_house', function() {
+            this.select('id_house').from('HouseMembers').where('id_user', user.id);
+        });
+    }
+
+    const house = await query.first();
 
     if (!house) {
-        throw { status: 404, message: "Casa no encontrada" };
+        throw { status: 404, message: "Casa no encontrada o sin acceso" };
     }
 
     return house;
 }
 
-const createHouse = async (houseData) => {
-    const existingHouse = await db("Houses")
-        .where({ name: houseData.name })
-        .first();
-    if (existingHouse) {
-        throw { status: 400, message: "La casa ya existe" };
-    }
+const createHouse = async (houseData, userId) => {
+    return await db.transaction(async (trx) => {
+        const existingHouse = await trx("Houses")
+            .where({ name: houseData.name })
+            .first();
+        
+        if (existingHouse) {
+            throw { status: 400, message: "La casa ya existe" };
+        }
 
-    const [newId] = await db("Houses").insert(houseData);
-    return newId;
+        const [newId] = await trx("Houses").insert(houseData);
+
+        // Añadir automáticamente al creador como miembro de la casa
+        await trx("HouseMembers").insert({
+            id_house: newId,
+            id_user: userId
+        });
+
+        return newId;
+    });
 }
 
-const updateHouse = async (houseId, newHouseData) => {
-    const existingHouse = await db("Houses")
-        .where({ id_house: houseId })
-        .first();
-    if (!existingHouse) {
-        throw { status: 404, message: "Casa no encontrada" }
-    }
+const updateHouse = async (houseId, newHouseData, user) => {
+    // Verificar si existe y tiene acceso
+    await findHouseById(houseId, user);
+
     const updateData = {};
     if (newHouseData.name) updateData.name = newHouseData.name;
     if (newHouseData.address) updateData.address = newHouseData.address;
@@ -63,13 +84,10 @@ const updateHouse = async (houseId, newHouseData) => {
     }
 }
 
-const deleteHouse = async (houseId) => {
-    const existingHouse = await db("Houses")
-        .where({ id_house: houseId })
-        .first();
-    if (!existingHouse) {
-        throw { status: 404, message: "Casa no encontrada" }
-    }
+const deleteHouse = async (houseId, user) => {
+    // Verificar si existe y tiene acceso (en este caso delete suele ser admin, pero lo protegemos)
+    await findHouseById(houseId, user);
+    
     const deletedCount = await db("Houses").where({ id_house: houseId }).del();
     return deletedCount;
 }

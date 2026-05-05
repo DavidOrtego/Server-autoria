@@ -1,6 +1,6 @@
 const { db } = require('../config/database');
 const { hashPassword, comparePassword } = require('../utils/encryption');
-const { generateTokens, verifyRefreshToken } = require('../utils/jwt');
+const { generateTokens } = require('../utils/jwt');
 
 
 class AuthService {
@@ -90,37 +90,6 @@ class AuthService {
         return { user: userWithoutPassword, tokens };
     }
 
-    /**
-     * Genera nuevos tokens de acceso y refresco usando un refresh token existente
-     * @param {string} refreshToken - Refresh token existente
-     * @returns {Promise<Object>} Objeto con accessToken y refreshToken
-     */
-    async refreshToken(refreshToken) {
-    try {
-      // Verificar el refresh token
-      const decoded = verifyRefreshToken(refreshToken);
 
-
-      // Buscar usuario
-      const user = await db("Users")
-        .select("id_user","name", "email", "rol", "image")
-        .where({ id_user: decoded.id })
-        .first();
-
-
-      if (!user) {
-        throw { status: 401, message: "Usuario no encontrado" };
-      }
-
-
-      // Generar nuevos tokens
-      const tokens = generateTokens(user);
-
-
-      return tokens;
-    } catch (error) {
-      throw { status: 401, message: error.message || "Refresh token inválido" };
-    }
-  }
 }
 module.exports = new AuthService();

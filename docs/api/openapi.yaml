@@ -1,34 +1,58 @@
 openapi: 3.0.0
 info:
-  title: Vives API
-  description: API completa para la gestión de gastos y tareas en pisos compartidos, incluyendo autenticación y manejo de errores.
+  title: Vives House API (Simplificada)
+  description: API para la gestión de tareas y gastos en casas compartidas.
   version: 1.0.0
 
 servers:
-  - url: http://localhost:3000
-    description: Servidor local de desarrollo
-
-tags:
-  - name: Autenticación
-    description: Login manual y obtención de tokens JWT
-  - name: Usuarios
-    description: Gestión de usuarios del piso
-  - name: Gastos
-    description: Gestión de gastos compartidos
-  - name: Tareas
-    description: Gestión de tareas del hogar
-
-# Configuración global de seguridad (se pedirá en todas las rutas por defecto)
-security:
-  - ApiKeyAuth: []
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo
 
 paths:
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Juan Perez
+                email:
+                  type: string
+                  format: email
+                  example: juan@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: password123
+                rol:
+                  type: string
+                  enum: [admin, member]
+                  default: member
+      responses:
+        '201':
+          description: Usuario registrado correctamente
+        '400':
+          description: Errores de validación
+        '409':
+          description: El email ya está en uso
+
   /auth/login:
     post:
-      tags:
-        - Autenticación
       summary: Iniciar sesión
-      security: [] # El endpoint de login es público
+      tags:
+        - Auth
       requestBody:
         required: true
         content:
@@ -42,509 +66,34 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: "juan@example.com"
+                  example: juan@example.com
                 password:
                   type: string
-                  format: password
-                  example: "123456"
+                  example: password123
       responses:
         '200':
-          description: Login exitoso. Retorna el token JWT.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Login exitoso
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Credenciales incorrectas
+        '404':
+          description: Usuario no encontrado
 
-  /usuarios:
+  /auth/me:
     get:
+      summary: Obtener datos del usuario autenticado
       tags:
-        - Usuarios
-      summary: Obtener todos los usuarios
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - Auth
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: Lista paginada de usuarios
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Usuario'
+          description: Datos del usuario obtenidos correctamente
         '401':
-          $ref: '#/components/responses/Unauthorized'
-    post:
-      tags:
-        - Usuarios
-      summary: Registrar un nuevo usuario
-      security: [] # Opcionalmente público para el registro
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevoUsuario'
-      responses:
-        '201':
-          description: Usuario creado exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Usuario'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-
-  /usuarios/{id}:
-    parameters:
-      - $ref: '#/components/parameters/IdPathParam'
-    get:
-      tags:
-        - Usuarios
-      summary: Obtener un usuario por ID
-      responses:
-        '200':
-          description: Detalles del usuario
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Usuario'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    put:
-      tags:
-        - Usuarios
-      summary: Actualizar un usuario existente
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevoUsuario'
-      responses:
-        '200':
-          description: Usuario actualizado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Usuario'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags:
-        - Usuarios
-      summary: Eliminar un usuario
-      responses:
-        '204':
-          description: Usuario eliminado exitosamente
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /gastos:
-    get:
-      tags:
-        - Gastos
-      summary: Obtener todos los gastos
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-      responses:
-        '200':
-          description: Lista paginada de gastos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Gasto'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-    post: 
-      tags:
-        - Gastos
-      summary: Crear un nuevo gasto
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevoGasto'
-      responses:
-        '201':
-          description: Gasto creado exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Gasto'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /gastos/{id}:
-    parameters:
-      - $ref: '#/components/parameters/IdPathParam'
-    get:
-      tags:
-        - Gastos
-      summary: Obtener un gasto por ID
-      responses:
-        '200':
-          description: Detalles del gasto
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Gasto'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    put:
-      tags:
-        - Gastos
-      summary: Actualizar un gasto
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevoGasto'
-      responses:
-        '200':
-          description: Gasto actualizado
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Gasto'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags:
-        - Gastos
-      summary: Eliminar un gasto
-      responses:
-        '204':
-          description: Gasto eliminado
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /tareas:
-    get:
-      tags:
-        - Tareas
-      summary: Obtener todas las tareas
-      parameters:
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-        - name: status
-          in: query
-          description: Filtrar tareas por estado
-          required: false
-          schema:
-            type: string
-            enum: [pendiente, en_progreso, completada]
-      responses:
-        '200':
-          description: Lista paginada de tareas
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Tarea'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-    post:
-      tags:
-        - Tareas
-      summary: Crear una nueva tarea
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevaTarea'
-      responses:
-        '201':
-          description: Tarea creada exitosamente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tarea'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /tareas/{id}:
-    parameters:
-      - $ref: '#/components/parameters/IdPathParam'
-    get:
-      tags:
-        - Tareas
-      summary: Obtener una tarea por ID
-      responses:
-        '200':
-          description: Detalles de la tarea
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tarea'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    put:
-      tags:
-        - Tareas
-      summary: Actualizar una tarea
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NuevaTarea'
-      responses:
-        '200':
-          description: Tarea actualizada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tarea'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags:
-        - Tareas
-      summary: Eliminar una tarea
-      responses:
-        '204':
-          description: Tarea eliminada
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+          description: No autorizado
 
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: x-api-key
-      # Utilizamos API Key en vez de JWT por requerimiento del proyecto
-      description: Clave API que se debe enviar en la cabecera HTTP requerida.
-
-  parameters:
-    IdPathParam:
-      name: id
-      in: path
-      required: true
-      description: ID del recurso
-      schema:
-        type: integer
-      example: 1
-    PageParam:
-      name: page
-      in: query
-      required: false
-      description: Número de la página
-      schema:
-        type: integer
-        default: 1
-    LimitParam:
-      name: limit
-      in: query
-      required: false
-      description: Cantidad de resultados por página
-      schema:
-        type: integer
-        default: 10
-
-  responses:
-    BadRequest:
-      description: Petición inválida (e.g. faltan parámetros obligatorios)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Faltan credenciales o el token es inválido (Sin autorización)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: El recurso solicitado no se ha encontrado
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    InternalServerError:
-      description: Error interno del servidor
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-  schemas:
-    Error:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        message:
-          type: string
-          example: "Ha ocurrido un error en la solicitud"
-        error:
-          type: string
-          example: "Bad Request"
-
-    Usuario:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: "Juan Pérez"
-        email:
-          type: string
-          format: email
-          example: "juan@example.com"
-        createdAt:
-          type: string
-          format: date-time
-
-    NuevoUsuario:
-      type: object
-      required:
-        - name
-        - email
-        - password
-      properties:
-        name:
-          type: string
-          example: "Juan Pérez"
-        email:
-          type: string
-          format: email
-          example: "juan@example.com"
-        password:
-          type: string
-          format: password
-          example: "123456"
-
-    Gasto:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        description:
-          type: string
-          example: "Compra supermercado"
-        amount:
-          type: number
-          format: float
-          example: 45.50
-        date:
-          type: string
-          format: date-time
-        userId:
-          type: integer
-          description: ID del usuario que pagó el gasto
-          example: 1
-
-    NuevoGasto:
-      type: object
-      required:
-        - description
-        - amount
-        - date
-        - userId
-      properties:
-        description:
-          type: string
-          example: "Compra del mes"
-        amount:
-          type: number
-          example: 120.50
-        date:
-          type: string
-          format: date-time
-        userId:
-          type: integer
-          example: 1
-
-    Tarea:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        title:
-          type: string
-          example: "Limpiar la cocina"
-        description:
-          type: string
-          example: "Limpiar superficies y barrer el suelo"
-        dueDate:
-          type: string
-          format: date-time
-        userId:
-          type: integer
-          description: ID del usuario asignado
-          example: 2
-        status:
-          type: string
-          enum: [pendiente, en_progreso, completada]
-          example: "pendiente"
-
-    NuevaTarea:
-      type: object
-      required:
-        - title
-        - userId
-      properties:
-        title:
-          type: string
-          example: "Sacar la basura"
-        description:
-          type: string
-          example: "Los martes y jueves"
-        dueDate:
-          type: string
-          format: date-time
-        userId:
-          type: integer
-          example: 2
-        status:
-          type: string
-          enum: [pendiente, en_progreso, completada]
-          default: "pendiente"
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -15,6 +15,8 @@ class AuthController {
 
 
       res.status(201).json({
+        code: 201,
+        title: "Created",
         success: true,
         message: "Usuario registrado correctamente",
         data: result,
@@ -38,6 +40,8 @@ class AuthController {
 
 
       res.status(200).json({
+        code: 200,
+        title: "Success",
         success: true,
         message: "Login exitoso",
         data: result,
@@ -47,75 +51,7 @@ class AuthController {
     }
   }
 
-  /**
-   * Refresca los tokens de autenticación.
-   * @param {Object} req - Request object.
-   * @param {Object} res - Response object.
-   * @param {Function} next - Next function.
-   * @returns {Promise<void>}
-   */
-  async refreshToken(req, res, next) {
-    try {
-      const { refreshToken } = req.body;
-      const tokens = await authService.refreshToken(refreshToken);
 
-      res.status(200).json({
-        success: true,
-        message: "Tokens refrescados correctamente",
-        data: tokens,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
- /**
-   * Cambia la contraseña de un usuario.
-   * @param {Object} req - Request object.
-   * @param {Object} res - Response object.
-   * @param {Function} next - Next function.
-   * @returns {Promise<void>}
-   */
-  async changePassword(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { oldPassword, newPassword } = req.body;
-      const result = await authService.changePassword(
-        userId,
-        oldPassword,
-        newPassword,
-      );
-
-
-      res.status(200).json({
-        success: true,
-        message: "Contraseña cambiada correctamente",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-  /**
-   * Solicita el reseteo de la contraseña.
-   * @param {Object} req - Request object.
-   * @param {Object} res - Response object.
-   * @param {Function} next - Next function.
-   * @returns {Promise<void>}
-   */
- async forgotPassword(req, res, next) {
-    try {
-      const { email } = req.body;
-      const result = await authService.requestPasswordReset(email);
-
-
-      res.status(200).json({
-        success: true,
-        message: result.message,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
 
   /**
    * Obtiene los datos del usuario autenticado.
@@ -127,6 +63,8 @@ class AuthController {
   async me(req, res, next) {
     try {
       res.status(200).json({
+        code: 200,
+        title: "Success",
         success: true,
         data: {
           id: req.user.id,

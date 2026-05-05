@@ -1,5 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const fs = require("fs");
+const yaml = require("js-yaml");
+const path = require("path");
 
 // Importar nuestras rutas
 const authRoutes = require("./routes/authRoutes");
@@ -17,6 +21,14 @@ const app = express();
 // Middlewares base
 app.use(cors());
 app.use(express.json());
+
+// Leer y parsear el archivo openapi.yaml
+const swaggerDocument = yaml.load(fs.readFileSync(path.join(__dirname, '../docs/api/openapi.yaml'), 'utf8'));
+
+// -----------------------------------------
+// DOCUMENTACIÓN (Swagger)
+// -----------------------------------------
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // -----------------------------------------
 // RUTAS PRINCIPALES

@@ -10,9 +10,6 @@ const authController = require("../controllers/authController");
 const {
     registerValidators,
     loginValidators,
-    refreshTokenValidators,
-    changePasswordValidators,
-    forgotPasswordValidators,
 } = require("../validators/authValidator");
 
 
@@ -40,30 +37,7 @@ router.post(
   authController.loginUser,
 );
 
-// Ruta para refrescar token
-router.post(
-  "/refresh-token",
-  refreshTokenValidators,
-  handleValidationErrors,
-  authController.refreshToken,
-);
 
-// Ruta para cambiar contraseña (Requiere estar logueado, usamos authenticateToken)
-router.post(
-  "/change-password",
-  authenticateToken,
-  changePasswordValidators,
-  handleValidationErrors,
-  authController.changePassword,
-);
-
-// Ruta para solicitar reseteo de contraseña
-router.post(
-  "/forgot-password",
-  forgotPasswordValidators,
-  handleValidationErrors,
-  authController.forgotPassword,
-);
 
 // Ruta para obtener mis datos
 router.get("/me", authenticateToken, authController.me);

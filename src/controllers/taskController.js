@@ -17,7 +17,7 @@ const {
  */
 const getAllTasks = async (req, res, next) => {
     try {
-        const tasks = await findAllTasks();
+        const tasks = await findAllTasks(req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -39,7 +39,7 @@ const getAllTasks = async (req, res, next) => {
 const getTaskById = async (req, res, next) => {
     try {
         const { taskId } = req.params;
-        const task = await findTaskById(taskId);
+        const task = await findTaskById(taskId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -61,7 +61,7 @@ const getTaskById = async (req, res, next) => {
 const postTask = async (req, res, next) => {
     try {
         const taskData = req.body;
-        const newId = await createTask(taskData);
+        const newId = await createTask(taskData, req.user);
         const newTask = {
             id_task: newId,
             ...taskData,
@@ -89,8 +89,8 @@ const putTask = async (req, res, next) => {
     try {
         const { taskId } = req.params;
         const taskData = req.body;
-        await updateTask(taskId, taskData);
-        const updatedTask = await findTaskById(taskId);
+        await updateTask(taskId, taskData, req.user);
+        const updatedTask = await findTaskById(taskId, req.user);
 
         res.status(200).json({
             code: 200,
@@ -113,7 +113,7 @@ const putTask = async (req, res, next) => {
 const deleteATask = async (req, res, next) => {
     try {
         const { taskId } = req.params;
-        await deleteTask(taskId);
+        await deleteTask(taskId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -130,7 +130,7 @@ const deleteATask = async (req, res, next) => {
 const getTasksByHouse = async (req, res, next) => {
     try {
         const { houseId } = req.params;
-        const tasks = await findTasksByHouse(houseId);
+        const tasks = await findTasksByHouse(houseId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -148,7 +148,7 @@ const getTasksByHouse = async (req, res, next) => {
 const getTasksByUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
-        const tasks = await findTasksByUser(userId);
+        const tasks = await findTasksByUser(userId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",

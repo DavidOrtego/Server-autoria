@@ -17,7 +17,7 @@ const {
  */
 const getAllExpenses = async (req, res, next) => {
     try {
-        const expenses = await findAllExpenses();
+        const expenses = await findAllExpenses(req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -39,7 +39,7 @@ const getAllExpenses = async (req, res, next) => {
 const getExpenseById = async (req, res, next) => {
     try {
         const { expenseId } = req.params;
-        const expense = await findExpenseById(expenseId);
+        const expense = await findExpenseById(expenseId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -61,7 +61,7 @@ const getExpenseById = async (req, res, next) => {
 const postExpense = async (req, res, next) => {
     try {
         const expenseData = req.body;
-        const newId = await createExpense(expenseData);
+        const newId = await createExpense(expenseData, req.user);
         const newExpense = {
             id_expense: newId,
             ...expenseData,
@@ -89,8 +89,8 @@ const putExpense = async (req, res, next) => {
     try {
         const { expenseId } = req.params;
         const expenseData = req.body;
-        await updateExpense(expenseId, expenseData);
-        const updatedExpense = await findExpenseById(expenseId);
+        await updateExpense(expenseId, expenseData, req.user);
+        const updatedExpense = await findExpenseById(expenseId, req.user);
 
         res.status(200).json({
             code: 200,
@@ -113,7 +113,7 @@ const putExpense = async (req, res, next) => {
 const deleteAExpense = async (req, res, next) => {
     try {
         const { expenseId } = req.params;
-        await deleteExpense(expenseId);
+        await deleteExpense(expenseId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -130,7 +130,7 @@ const deleteAExpense = async (req, res, next) => {
 const getExpensesByHouse = async (req, res, next) => {
     try {
         const { houseId } = req.params;
-        const expenses = await findExpensesByHouse(houseId);
+        const expenses = await findExpensesByHouse(houseId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -148,7 +148,7 @@ const getExpensesByHouse = async (req, res, next) => {
 const getExpensesByUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
-        const expenses = await findExpensesByUser(userId);
+        const expenses = await findExpensesByUser(userId, req.user);
         res.status(200).json({
             code: 200,
             title: "Success",

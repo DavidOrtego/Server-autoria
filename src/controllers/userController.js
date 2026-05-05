@@ -36,7 +36,7 @@ const getAllUsers = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const user = await findUserById(userId);
+    const user = await findUserById(userId, req.user);
     if (!user) {
       return res.status(404).json({
         code: 404,
@@ -68,8 +68,8 @@ const putUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const userData = req.body;
-    await updateUser(userId, userData);
-    const updatedUser = await findUserById(userId);
+    await updateUser(userId, userData, req.user);
+    const updatedUser = await findUserById(userId, req.user);
     if (!updatedUser) {
       return res.status(404).json({
         code: 404,
@@ -98,7 +98,7 @@ const putUser = async (req, res, next) => {
 const deleteAUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const deletedUser = await deleteUser(userId);
+    const deletedUser = await deleteUser(userId, req.user);
     if (deletedUser === 0) {
       return res.status(404).json({
         code: 404,

@@ -1,5 +1,4 @@
 const {body, param } = require("express-validator");
-const { confirmPassword } = require("../utils/confirmPassword.js");
 
 
 const registerValidators = [

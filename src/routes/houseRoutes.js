@@ -44,6 +44,7 @@ router.post(
 // PUT /houses/:houseId -> Actualiza la información de una casa
 router.put(
   "/:houseId",
+  houseIdParamValidator,
   updateHouseValidators,
   handleValidationErrors,
   houseController.putHouse

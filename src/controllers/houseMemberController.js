@@ -1,5 +1,4 @@
 const {
-    findAllHouseMembers,
     findMembersByHouseId,
     findHousesByUserId,
     addMemberToHouse,
@@ -72,8 +71,8 @@ const getHousesByUserId = async (req, res, next) => {
  */
 const postHouseMember = async (req, res, next) => {
     try {
-        const { id_house, id_user } = req.body;
-        const houseMember = await addMemberToHouse(id_house, id_user, req.user);
+        const { id_house, email } = req.body;
+        const houseMember = await addMemberToHouse(id_house, email, req.user);
         if (!houseMember) {
             return res.status(404).json({
                 code: 404,

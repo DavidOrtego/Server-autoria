@@ -1,15 +1,6 @@
 const { db } = require("../config/database");
 
 /**
- * Busca a todos los miembros de una casa
- * @returns {Promise<Object>} Objeto con todos los miembros
- */
-const findAllHouseMembers = async () => {
-    const members = await db("HouseMembers").select("*");
-    return members;
-};
-
-/**
  * Busca a los miembros de una casa por su ID
  * @param {number} houseId - ID de la casa
  * @returns {Promise<Object>} Objeto con los miembros
@@ -70,12 +61,12 @@ const findHousesByUserId = async (userId, user) => {
 };
 
 /**
- * Añade un usuario a una casa
+ * Añade un usuario a una casa usando su email
  * @param {number} houseId - ID de la casa
- * @param {number} userId - ID del usuario
+ * @param {string} email - Email del usuario a añadir
  * @returns {Promise<Object>} Objeto con el ID de la membresía
  */
-const addMemberToHouse = async (houseId, userId, user) => {
+const addMemberToHouse = async (houseId, email, user) => {
     // Solo un miembro actual de la casa o un admin pueden invitar a otros
     if (user.rol !== 'admin') {
         const membership = await db("HouseMembers")
@@ -86,9 +77,17 @@ const addMemberToHouse = async (houseId, userId, user) => {
         }
     }
 
+    // Buscar al usuario por email
+    const targetUser = await db("Users").where({ email }).first();
+    if (!targetUser) {
+        throw { status: 404, message: "No se encontró ningún usuario con ese email" };
+    }
+    
+    const targetUserId = targetUser.id_user;
+
     // Verificar si ya es miembro para evitar duplicados
     const existing = await db("HouseMembers")
-        .where({ id_house: houseId, id_user: userId })
+        .where({ id_house: houseId, id_user: targetUserId })
         .first();
     
     if (existing) {
@@ -97,7 +96,7 @@ const addMemberToHouse = async (houseId, userId, user) => {
 
     const [id] = await db("HouseMembers").insert({
         id_house: houseId,
-        id_user: userId
+        id_user: targetUserId
     });
     
     return id;
@@ -132,7 +131,6 @@ const removeMemberFromHouse = async (houseId, userId, user) => {
 };
 
 module.exports = {
-    findAllHouseMembers,
     findMembersByHouseId,
     findHousesByUserId,
     addMemberToHouse,

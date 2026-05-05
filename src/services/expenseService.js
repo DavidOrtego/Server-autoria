@@ -1,7 +1,7 @@
 const { db } = require("../config/database");
 
-const findAllExpenses = async () => {
-    const expenses = await db("Expenses").select(
+const findAllExpenses = async (user) => {
+    let query = db("Expenses").select(
         "id_expense",
         "amount",
         "description",
@@ -9,11 +9,20 @@ const findAllExpenses = async () => {
         "id_user",
         "id_house"
     );
-    return expenses;
+
+    if (user.rol !== 'admin') {
+        query = query.where(function() {
+            this.whereIn('id_house', function() {
+                this.select('id_house').from('HouseMembers').where('id_user', user.id);
+            }).orWhere('id_user', user.id);
+        });
+    }
+
+    return await query;
 }
 
-const findExpenseById = async (expenseId) => {
-    const expense = await db("Expenses")
+const findExpenseById = async (expenseId, user) => {
+    let query = db("Expenses")
         .select(
             "id_expense",
             "amount",
@@ -22,29 +31,42 @@ const findExpenseById = async (expenseId) => {
             "id_user",
             "id_house"
         )
-        .where({ id_expense: expenseId })
-        .first();
+        .where({ id_expense: expenseId });
+
+    if (user.rol !== 'admin') {
+        query = query.where(function() {
+            this.whereIn('id_house', function() {
+                this.select('id_house').from('HouseMembers').where('id_user', user.id);
+            }).orWhere('id_user', user.id);
+        });
+    }
+
+    const expense = await query.first();
 
     if (!expense) {
-        throw { status: 404, message: "Gasto no encontrado" };
+        throw { status: 404, message: "Gasto no encontrado o sin acceso" };
     }
 
     return expense;
 }
 
-const createExpense = async (expenseData) => {
+const createExpense = async (expenseData, user) => {
+    // Verificar si el usuario tiene acceso a la casa
+    if (user.rol !== 'admin') {
+        const membership = await db("HouseMembers")
+            .where({ id_house: expenseData.id_house, id_user: user.id })
+            .first();
+        if (!membership) {
+            throw { status: 403, message: "No tienes permiso para registrar gastos en esta casa" };
+        }
+    }
+
     const [id] = await db("Expenses").insert(expenseData);
     return id;
 }
 
-const updateExpense = async (expenseId, newExpenseData) => {
-    const existingExpense = await db("Expenses")
-        .where({ id_expense: expenseId })
-        .first();
-    
-    if (!existingExpense) {
-        throw { status: 404, message: "Gasto no encontrado" };
-    }
+const updateExpense = async (expenseId, newExpenseData, user) => {
+    const existingExpense = await findExpenseById(expenseId, user);
 
     const updateData = {};
     if (newExpenseData.amount) updateData.amount = newExpenseData.amount;
@@ -58,20 +80,24 @@ const updateExpense = async (expenseId, newExpenseData) => {
     }
 }
 
-const deleteExpense = async (expenseId) => {
-    const existingExpense = await db("Expenses")
-        .where({ id_expense: expenseId })
-        .first();
-    
-    if (!existingExpense) {
-        throw { status: 404, message: "Gasto no encontrado" };
-    }
+const deleteExpense = async (expenseId, user) => {
+    await findExpenseById(expenseId, user);
     
     await db("Expenses").where({ id_expense: expenseId }).del();
     return { message: "Gasto eliminado correctamente" };
 }
 
-const findExpensesByHouse = async (houseId) => {
+const findExpensesByHouse = async (houseId, user) => {
+    // Verificar acceso a la casa
+    if (user.rol !== 'admin') {
+        const membership = await db("HouseMembers")
+            .where({ id_house: houseId, id_user: user.id })
+            .first();
+        if (!membership) {
+            throw { status: 403, message: "No tienes acceso a los gastos de esta casa" };
+        }
+    }
+
     const expenses = await db("Expenses")
         .select(
             "id_expense",
@@ -85,7 +111,22 @@ const findExpensesByHouse = async (houseId) => {
     return expenses;
 }
 
-const findExpensesByUser = async (userId) => {
+const findExpensesByUser = async (userId, user) => {
+    // Un usuario solo puede ver sus propios gastos, a menos que sea admin
+    // o que comparta casa con el usuario dueño del gasto.
+    if (user.rol !== 'admin' && user.id !== parseInt(userId)) {
+        const sharedHouses = await db("HouseMembers")
+            .whereIn('id_house', function() {
+                this.select('id_house').from('HouseMembers').where('id_user', user.id);
+            })
+            .where('id_user', userId)
+            .first();
+        
+        if (!sharedHouses) {
+            throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
+        }
+    }
+
     const expenses = await db("Expenses")
         .select(
             "id_expense",

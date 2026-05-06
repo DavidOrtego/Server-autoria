@@ -1,20 +1,25 @@
 const { db } = require("../config/database");
 
 const findAllExpenses = async (user) => {
-    let query = db("Expenses").select(
-        "id_expense",
-        "amount",
-        "description",
-        "date",
-        "id_user",
-        "id_house"
-    );
+    let query = db("Expenses as e")
+        .select(
+            "e.id_expense",
+            "e.amount",
+            "e.description",
+            "e.date",
+            "e.id_user",
+            "u.name as user_name",
+            "e.id_house",
+            "h.name as house_name"
+        )
+        .join("Users as u", "e.id_user", "u.id_user")
+        .join("Houses as h", "e.id_house", "h.id_house");
 
     if (user.rol !== 'admin') {
         query = query.where(function() {
-            this.whereIn('id_house', function() {
+            this.whereIn('e.id_house', function() {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            }).orWhere('id_user', user.id);
+            }).orWhere('e.id_user', user.id);
         });
     }
 
@@ -22,22 +27,26 @@ const findAllExpenses = async (user) => {
 }
 
 const findExpenseById = async (expenseId, user) => {
-    let query = db("Expenses")
+    let query = db("Expenses as e")
         .select(
-            "id_expense",
-            "amount",
-            "description",
-            "date",
-            "id_user",
-            "id_house"
+            "e.id_expense",
+            "e.amount",
+            "e.description",
+            "e.date",
+            "e.id_user",
+            "u.name as user_name",
+            "e.id_house",
+            "h.name as house_name"
         )
-        .where({ id_expense: expenseId });
+        .join("Users as u", "e.id_user", "u.id_user")
+        .join("Houses as h", "e.id_house", "h.id_house")
+        .where({ "e.id_expense": expenseId });
 
     if (user.rol !== 'admin') {
         query = query.where(function() {
-            this.whereIn('id_house', function() {
+            this.whereIn('e.id_house', function() {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            }).orWhere('id_user', user.id);
+            }).orWhere('e.id_user', user.id);
         });
     }
 
@@ -61,7 +70,25 @@ const createExpense = async (expenseData, user) => {
         }
     }
 
-    const [id] = await db("Expenses").insert(expenseData);
+    // Verificar que el usuario asignado al gasto pertenece a la casa
+    const targetUserMembership = await db("HouseMembers")
+        .where({ id_house: expenseData.id_house, id_user: expenseData.id_user })
+        .first();
+    
+    if (!targetUserMembership) {
+        throw { status: 400, message: "El usuario asignado no pertenece a esta casa" };
+    }
+
+    // Sanitizar datos para insertar solo campos válidos
+    const dataToInsert = {
+        amount: expenseData.amount,
+        description: expenseData.description,
+        date: expenseData.date, // MySQL espera YYYY-MM-DD
+        id_user: expenseData.id_user,
+        id_house: expenseData.id_house
+    };
+
+    const [id] = await db("Expenses").insert(dataToInsert);
     return id;
 }
 
@@ -76,6 +103,20 @@ const updateExpense = async (expenseId, newExpenseData, user) => {
     if (newExpenseData.id_house) updateData.id_house = newExpenseData.id_house;
 
     if (Object.keys(updateData).length > 0) {
+        // Si se está cambiando el usuario o la casa, verificar que el usuario pertenece a la casa
+        if (updateData.id_user || updateData.id_house) {
+            const finalUserId = updateData.id_user || existingExpense.id_user;
+            const finalHouseId = updateData.id_house || existingExpense.id_house;
+
+            const targetMembership = await db("HouseMembers")
+                .where({ id_house: finalHouseId, id_user: finalUserId })
+                .first();
+            
+            if (!targetMembership) {
+                throw { status: 400, message: "El usuario asignado no pertenece a esa casa" };
+            }
+        }
+
         await db("Expenses").where({ id_expense: expenseId }).update(updateData);
     }
 }
@@ -98,46 +139,63 @@ const findExpensesByHouse = async (houseId, user) => {
         }
     }
 
-    const expenses = await db("Expenses")
+    const expenses = await db("Expenses as e")
         .select(
-            "id_expense",
-            "amount",
-            "description",
-            "date",
-            "id_user",
-            "id_house"
+            "e.id_expense",
+            "e.amount",
+            "e.description",
+            "e.date",
+            "e.id_user",
+            "u.name as user_name",
+            "e.id_house"
         )
-        .where({ id_house: houseId });
+        .join("Users as u", "e.id_user", "u.id_user")
+        .where({ "e.id_house": houseId });
     return expenses;
 }
 
 const findExpensesByUser = async (userId, user) => {
-    // Un usuario solo puede ver sus propios gastos, a menos que sea admin
-    // o que comparta casa con el usuario dueño del gasto.
+    let query = db("Expenses as e")
+        .select(
+            "e.id_expense",
+            "e.amount",
+            "e.description",
+            "e.date",
+            "e.id_user",
+            "u.name as user_name",
+            "e.id_house",
+            "h.name as house_name"
+        )
+        .join("Users as u", "e.id_user", "u.id_user")
+        .join("Houses as h", "e.id_house", "h.id_house")
+        .where("e.id_user", userId);
+
+    // Si no es admin y no es su propio perfil
     if (user.rol !== 'admin' && user.id !== parseInt(userId)) {
-        const sharedHouses = await db("HouseMembers")
-            .whereIn('id_house', function() {
-                this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            })
-            .where('id_user', userId)
-            .first();
-        
-        if (!sharedHouses) {
-            throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
+        // Solo puede ver los gastos del usuario en las casas que comparten
+        query = query.whereIn('e.id_house', function() {
+            this.select('id_house').from('HouseMembers').where('id_user', user.id);
+        });
+
+        const expenses = await query;
+
+        // Si no hay gastos devueltos, verificamos si es porque no tienen o porque no comparten casa
+        if (expenses.length === 0) {
+            const sharedHouses = await db("HouseMembers")
+                .whereIn('id_house', function() {
+                    this.select('id_house').from('HouseMembers').where('id_user', user.id);
+                })
+                .where('id_user', userId)
+                .first();
+            
+            if (!sharedHouses) {
+                throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
+            }
         }
+        return expenses;
     }
 
-    const expenses = await db("Expenses")
-        .select(
-            "id_expense",
-            "amount",
-            "description",
-            "date",
-            "id_user",
-            "id_house"
-        )
-        .where({ id_user: userId });
-    return expenses;
+    return await query;
 }
 
 module.exports = {

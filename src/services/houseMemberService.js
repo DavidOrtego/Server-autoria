@@ -1,20 +1,21 @@
 const { db } = require("../config/database");
 
 /**
- * Busca a todos los miembros de una casa
- * @returns {Promise<Object>} Objeto con todos los miembros
- */
-const findAllHouseMembers = async () => {
-    const members = await db("HouseMembers").select("*");
-    return members;
-};
-
-/**
  * Busca a los miembros de una casa por su ID
  * @param {number} houseId - ID de la casa
  * @returns {Promise<Object>} Objeto con los miembros
  */
-const findMembersByHouseId = async (houseId) => {
+const findMembersByHouseId = async (houseId, user) => {
+    // Verificar si el usuario tiene acceso a la casa
+    if (user.rol !== 'admin') {
+        const membership = await db("HouseMembers")
+            .where({ id_house: houseId, id_user: user.id })
+            .first();
+        if (!membership) {
+            throw { status: 403, message: "No tienes permiso para ver los miembros de esta casa" };
+        }
+    }
+
     const members = await db("HouseMembers")
         .join("Users", "HouseMembers.id_user", "=", "Users.id_user")
         .select(
@@ -36,7 +37,12 @@ const findMembersByHouseId = async (houseId) => {
  * @param {number} userId - ID del usuario
  * @returns {Promise<Object>} Objeto con las casas
  */
-const findHousesByUserId = async (userId) => {
+const findHousesByUserId = async (userId, user) => {
+    // Solo el propio usuario o el admin pueden ver en qué casas está metido
+    if (user.rol !== 'admin' && parseInt(user.id) !== parseInt(userId)) {
+        throw { status: 403, message: "No tienes permiso para ver esta información" };
+    }
+
     const houses = await db("HouseMembers")
         .join("Houses", "HouseMembers.id_house", "=", "Houses.id_house")
         .select(
@@ -55,15 +61,33 @@ const findHousesByUserId = async (userId) => {
 };
 
 /**
- * Añade un usuario a una casa
+ * Añade un usuario a una casa usando su email
  * @param {number} houseId - ID de la casa
- * @param {number} userId - ID del usuario
+ * @param {string} email - Email del usuario a añadir
  * @returns {Promise<Object>} Objeto con el ID de la membresía
  */
-const addMemberToHouse = async (houseId, userId) => {
+const addMemberToHouse = async (houseId, email, user) => {
+    // Solo un miembro actual de la casa o un admin pueden invitar a otros
+    if (user.rol !== 'admin') {
+        const membership = await db("HouseMembers")
+            .where({ id_house: houseId, id_user: user.id })
+            .first();
+        if (!membership) {
+            throw { status: 403, message: "Solo los miembros de la casa pueden añadir a otros" };
+        }
+    }
+
+    // Buscar al usuario por email
+    const targetUser = await db("Users").where({ email }).first();
+    if (!targetUser) {
+        throw { status: 404, message: "No se encontró ningún usuario con ese email" };
+    }
+    
+    const targetUserId = targetUser.id_user;
+
     // Verificar si ya es miembro para evitar duplicados
     const existing = await db("HouseMembers")
-        .where({ id_house: houseId, id_user: userId })
+        .where({ id_house: houseId, id_user: targetUserId })
         .first();
     
     if (existing) {
@@ -72,7 +96,7 @@ const addMemberToHouse = async (houseId, userId) => {
 
     const [id] = await db("HouseMembers").insert({
         id_house: houseId,
-        id_user: userId
+        id_user: targetUserId
     });
     
     return id;
@@ -83,7 +107,18 @@ const addMemberToHouse = async (houseId, userId) => {
  * @param {number} userId - ID del usuario
  * @returns {Promise<Object>} Objeto con el número de registros eliminados
  */
-const removeMemberFromHouse = async (houseId, userId) => {
+const removeMemberFromHouse = async (houseId, userId, user) => {
+    // Solo un miembro de la casa o admin puede eliminar miembros
+    // (O el propio usuario si quiere irse de la casa)
+    if (user.rol !== 'admin' && parseInt(user.id) !== parseInt(userId)) {
+        const membership = await db("HouseMembers")
+            .where({ id_house: houseId, id_user: user.id })
+            .first();
+        if (!membership) {
+            throw { status: 403, message: "No tienes permiso para eliminar miembros de esta casa" };
+        }
+    }
+
     const deletedCount = await db("HouseMembers")
         .where({ id_house: houseId, id_user: userId })
         .del();
@@ -96,7 +131,6 @@ const removeMemberFromHouse = async (houseId, userId) => {
 };
 
 module.exports = {
-    findAllHouseMembers,
     findMembersByHouseId,
     findHousesByUserId,
     addMemberToHouse,

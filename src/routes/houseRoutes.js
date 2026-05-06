@@ -44,6 +44,7 @@ router.post(
 // PUT /houses/:houseId -> Actualiza la información de una casa
 router.put(
   "/:houseId",
+  houseIdParamValidator,
   updateHouseValidators,
   handleValidationErrors,
   houseController.putHouse
@@ -52,7 +53,6 @@ router.put(
 // DELETE /houses/:houseId -> Elimina una casa
 router.delete(
   "/:houseId",
-  isAdmin,
   houseIdParamValidator,
   handleValidationErrors,
   houseController.deleteAHouse

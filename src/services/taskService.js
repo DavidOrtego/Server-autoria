@@ -1,21 +1,26 @@
 const { db } = require("../config/database");
 
 const findAllTasks = async (user) => {
-    let query = db("Tasks").select(
-        "id_task",
-        "name",
-        "description",
-        "state",
-        "expiration_date",
-        "id_house",
-        "id_user"
-    );
+    let query = db("Tasks as t")
+        .select(
+            "t.id_task",
+            "t.name",
+            "t.description",
+            "t.state",
+            "t.expiration_date",
+            "t.id_house",
+            "h.name as house_name",
+            "t.id_user",
+            "u.name as user_name"
+        )
+        .leftJoin("Users as u", "t.id_user", "u.id_user")
+        .join("Houses as h", "t.id_house", "h.id_house");
 
     if (user.rol !== 'admin') {
         query = query.where(function() {
-            this.whereIn('id_house', function() {
+            this.whereIn('t.id_house', function() {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            }).orWhere('id_user', user.id);
+            }).orWhere('t.id_user', user.id);
         });
     }
 
@@ -23,23 +28,27 @@ const findAllTasks = async (user) => {
 }
 
 const findTaskById = async (taskId, user) => {
-    let query = db("Tasks")
+    let query = db("Tasks as t")
         .select(
-            "id_task",
-            "name",
-            "description",
-            "state",
-            "expiration_date",
-            "id_house",
-            "id_user"
+            "t.id_task",
+            "t.name",
+            "t.description",
+            "t.state",
+            "t.expiration_date",
+            "t.id_house",
+            "h.name as house_name",
+            "t.id_user",
+            "u.name as user_name"
         )
-        .where({ id_task: taskId });
+        .leftJoin("Users as u", "t.id_user", "u.id_user")
+        .join("Houses as h", "t.id_house", "h.id_house")
+        .where({ "t.id_task": taskId });
 
     if (user.rol !== 'admin') {
         query = query.where(function() {
-            this.whereIn('id_house', function() {
+            this.whereIn('t.id_house', function() {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            }).orWhere('id_user', user.id);
+            }).orWhere('t.id_user', user.id);
         });
     }
 
@@ -63,7 +72,28 @@ const createTask = async (taskData, user) => {
         }
     }
 
-    const [id] = await db("Tasks").insert(taskData);
+    // Si se asigna un usuario a la tarea, verificar que pertenece a la casa
+    if (taskData.id_user) {
+        const targetUserMembership = await db("HouseMembers")
+            .where({ id_house: taskData.id_house, id_user: taskData.id_user })
+            .first();
+        
+        if (!targetUserMembership) {
+            throw { status: 400, message: "El usuario asignado no pertenece a esta casa" };
+        }
+    }
+
+    // Sanitizar datos para insertar solo campos válidos
+    const dataToInsert = {
+        name: taskData.name,
+        description: taskData.description || null,
+        state: taskData.state || 'pending',
+        expiration_date: (taskData.expiration_date && taskData.expiration_date.trim() !== "") ? taskData.expiration_date : null,
+        id_house: taskData.id_house,
+        id_user: (taskData.id_user && taskData.id_user !== "") ? taskData.id_user : null
+    };
+
+    const [id] = await db("Tasks").insert(dataToInsert);
     return id;
 }
 
@@ -83,16 +113,29 @@ const updateTask = async (taskId, newTaskData, user) => {
     if (newTaskData.id_user !== undefined) updateData.id_user = newTaskData.id_user;
 
     if (Object.keys(updateData).length > 0) {
+        // Si se está cambiando el usuario o la casa, verificar que el usuario pertenece a la casa
+        if (updateData.id_user || updateData.id_house) {
+            const finalUserId = updateData.id_user !== undefined ? updateData.id_user : existingTask.id_user;
+            const finalHouseId = updateData.id_house || existingTask.id_house;
+
+            if (finalUserId) {
+                const targetMembership = await db("HouseMembers")
+                    .where({ id_house: finalHouseId, id_user: finalUserId })
+                    .first();
+                
+                if (!targetMembership) {
+                    throw { status: 400, message: "El usuario asignado no pertenece a esa casa" };
+                }
+            }
+        }
+
         await db("Tasks").where({ id_task: taskId }).update(updateData);
     }
 }
 
 const deleteTask = async (taskId, user) => {
+    // Verificar existencia y acceso
     await findTaskById(taskId, user);
-    
-    if (!existingTask) {
-        throw { status: 404, message: "Tarea no encontrada" };
-    }
     
     await db("Tasks").where({ id_task: taskId }).del();
     return { message: "Tarea eliminada correctamente" };
@@ -109,49 +152,63 @@ const findTasksByHouse = async (houseId, user) => {
         }
     }
 
-    const tasks = await db("Tasks")
+    const tasks = await db("Tasks as t")
         .select(
-            "id_task",
-            "name",
-            "description",
-            "state",
-            "expiration_date",
-            "id_house",
-            "id_user"
+            "t.id_task",
+            "t.name",
+            "t.description",
+            "t.state",
+            "t.expiration_date",
+            "t.id_house",
+            "t.id_user",
+            "u.name as user_name"
         )
-        .where({ id_house: houseId });
+        .leftJoin("Users as u", "t.id_user", "u.id_user")
+        .where({ "t.id_house": houseId });
     return tasks;
 }
 
 const findTasksByUser = async (userId, user) => {
-    // Un usuario solo puede ver sus tareas asignadas, a menos que sea admin
-    // O que el que consulta sea miembro de la misma casa
+    let query = db("Tasks as t")
+        .select(
+            "t.id_task",
+            "t.name",
+            "t.description",
+            "t.state",
+            "t.expiration_date",
+            "t.id_house",
+            "h.name as house_name",
+            "t.id_user"
+        )
+        .join("Houses as h", "t.id_house", "h.id_house")
+        .where({ "t.id_user": userId });
+
+    // Si no es admin y no es su propio perfil
     if (user.rol !== 'admin' && user.id !== parseInt(userId)) {
-        // Vamos a permitirlo si comparten al menos una casa.
-        const sharedHouses = await db("HouseMembers")
-            .whereIn('id_house', function() {
-                this.select('id_house').from('HouseMembers').where('id_user', user.id);
-            })
-            .where('id_user', userId)
-            .first();
-        
-        if (!sharedHouses) {
-            throw { status: 403, message: "No tienes permiso para ver las tareas de este usuario" };
+        // Solo puede ver las tareas del usuario en las casas que comparten
+        query = query.whereIn('t.id_house', function() {
+            this.select('id_house').from('HouseMembers').where('id_user', user.id);
+        });
+
+        const tasks = await query;
+
+        // Si no hay tareas devueltas, verificamos si es porque no tienen o porque no comparten casa
+        if (tasks.length === 0) {
+            const sharedHouses = await db("HouseMembers")
+                .whereIn('id_house', function() {
+                    this.select('id_house').from('HouseMembers').where('id_user', user.id);
+                })
+                .where('id_user', userId)
+                .first();
+            
+            if (!sharedHouses) {
+                throw { status: 403, message: "No tienes permiso para ver las tareas de este usuario" };
+            }
         }
+        return tasks;
     }
 
-    const tasks = await db("Tasks")
-        .select(
-            "id_task",
-            "name",
-            "description",
-            "state",
-            "expiration_date",
-            "id_house",
-            "id_user"
-        )
-        .where({ id_user: userId });
-    return tasks;
+    return await query;
 }
 
 module.exports = {

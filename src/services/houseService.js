@@ -92,6 +92,15 @@ const deleteHouse = async (houseId, user) => {
     const tasksCount = await db("Tasks").where({ id_house: houseId }).count('* as total').first();
     //Comprobar si hay gastos en esta casa
     const expensesCount = await db("Expenses").where({ id_house: houseId }).count('* as total').first();
+    // Si hay datos, evitamos el borrado y avisamos al usuario
+    if (tasksCount.total > 0 || expensesCount.total > 0) {
+        throw {
+            status: 409,
+            message: `No se puede borrar la casa porque aún tiene ${tasksCount.total} tareas y ${expensesCount.total} gastos asociados.`
+        };
+    }
+    //Si todo está limpio, procedemos a borrar a los miembros y luego la casa
+    await db("HouseMembers").where({ id_house: houseId }).del();
     const deletedCount = await db("Houses").where({ id_house: houseId }).del();
     return deletedCount;
 }

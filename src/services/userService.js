@@ -71,6 +71,10 @@ const updateUser = async (userId, userData, requester) => {
  */
 const deleteUser = async (userId, requester) => {
   await findUserById(userId, requester); // Verifica si existe y permiso
+  //Funciones de integridad de borrado
+  //Comprobar si hay tareas asignadas a este usuario
+  const tasksCount = await db("Tasks").where({ id_user: userId }).count('* as total').first();
+
   await db("Users").where({ id_user: userId }).del();
   return { message: "Usuario eliminado correctamente" };
 };

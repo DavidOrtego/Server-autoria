@@ -87,6 +87,9 @@ const updateHouse = async (houseId, newHouseData, user) => {
 const deleteHouse = async (houseId, user) => {
     // Verificar si existe y tiene acceso (en este caso delete suele ser admin, pero lo protegemos)
     await findHouseById(houseId, user);
+    // Funciones de integridad de borrado
+    // Comprobar si hay tareas en esta casa
+    const tasksCount = await db("Tasks").where({ id_house: houseId }).count('* as total').first();
     
     const deletedCount = await db("Houses").where({ id_house: houseId }).del();
     return deletedCount;

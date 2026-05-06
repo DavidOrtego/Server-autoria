@@ -76,7 +76,15 @@ const deleteUser = async (userId, requester) => {
   const tasksCount = await db("Tasks").where({ id_user: userId }).count('* as total').first();
   //Comprobar si hay gastos registrados por este usuario
   const expensesCount = await db("Expenses").where({ id_user: userId }).count('* as total').first();
-  
+  //Si hay datos, evitamos el borrado y avisamos al usuario
+  if (tasksCount.total > 0 || expensesCount.total > 0) {
+      throw {
+          status: 409,
+          message: `No se puede borrar el usuario porque aún tiene ${tasksCount.total} tareas y ${expensesCount.total} gastos asociados.`
+      };
+  }
+  //Si todo está limpio, procedemos a borrar su membresía en las casas y luego el usuario
+  await db("HouseMembers").where({ id_user: userId }).del();
   await db("Users").where({ id_user: userId }).del();
   return { message: "Usuario eliminado correctamente" };
 };

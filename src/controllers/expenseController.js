@@ -17,7 +17,7 @@ const {
  */
 const getAllExpenses = async (req, res, next) => {
     try {
-        const expenses = await findAllExpenses(req.user);
+        const expenses = await findAllExpenses(req.user, req.query);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -130,7 +130,7 @@ const deleteAExpense = async (req, res, next) => {
 const getExpensesByHouse = async (req, res, next) => {
     try {
         const { houseId } = req.params;
-        const expenses = await findExpensesByHouse(houseId, req.user);
+        const expenses = await findExpensesByHouse(houseId, req.user, req.query);
         res.status(200).json({
             code: 200,
             title: "Success",
@@ -148,7 +148,7 @@ const getExpensesByHouse = async (req, res, next) => {
 const getExpensesByUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
-        const expenses = await findExpensesByUser(userId, req.user);
+        const expenses = await findExpensesByUser(userId, req.user, req.query);
         res.status(200).json({
             code: 200,
             title: "Success",

@@ -1,6 +1,6 @@
 const { db } = require("../config/database");
 
-const findAllExpenses = async (user) => {
+const findAllExpenses = async (user, filters = {}) => {
     let query = db("Expenses as e")
         .select(
             "e.id_expense",
@@ -21,6 +21,24 @@ const findAllExpenses = async (user) => {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
             }).orWhere('e.id_user', user.id);
         });
+    }
+    //Buscador y filtado dinamico
+    //firtar por minimo
+    if (filters.minAmount) {
+        query = query.where('e.amount', '>=', filters.minAmount);
+    }
+    //firtar por maximo
+    if (filters.maxAmount) {
+        query = query.where('e.amount', '<=', filters.maxAmount);
+    }
+    //Buscar por decripcion
+    if (filters.search) {
+        query = query.where('e.description', 'like', `%${filters.search}%`);
+    }
+    //ordenar
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'asc' ? 'asc' : 'desc';
+        query = query.orderBy(`e.${filters.sortBy}`, order);
     }
 
     return await query;
@@ -128,7 +146,7 @@ const deleteExpense = async (expenseId, user) => {
     return { message: "Gasto eliminado correctamente" };
 }
 
-const findExpensesByHouse = async (houseId, user) => {
+const findExpensesByHouse = async (houseId, user, filters = {}) => {
     // Verificar acceso a la casa
     if (user.rol !== 'admin') {
         const membership = await db("HouseMembers")
@@ -139,7 +157,7 @@ const findExpensesByHouse = async (houseId, user) => {
         }
     }
 
-    const expenses = await db("Expenses as e")
+    let query = db("Expenses as e")
         .select(
             "e.id_expense",
             "e.amount",
@@ -151,10 +169,25 @@ const findExpensesByHouse = async (houseId, user) => {
         )
         .join("Users as u", "e.id_user", "u.id_user")
         .where({ "e.id_house": houseId });
-    return expenses;
+        
+    if (filters.minAmount) {
+        query = query.where('e.amount', '>=', filters.minAmount);
+    }
+    if (filters.maxAmount) {
+        query = query.where('e.amount', '<=', filters.maxAmount);
+    }
+    if (filters.search) {
+        query = query.where('e.description', 'like', `%${filters.search}%`);
+    }
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'asc' ? 'asc' : 'desc';
+        query = query.orderBy(`e.${filters.sortBy}`, order);
+    }
+
+    return await query;
 }
 
-const findExpensesByUser = async (userId, user) => {
+const findExpensesByUser = async (userId, user, filters = {}) => {
     let query = db("Expenses as e")
         .select(
             "e.id_expense",
@@ -177,22 +210,31 @@ const findExpensesByUser = async (userId, user) => {
             this.select('id_house').from('HouseMembers').where('id_user', user.id);
         });
 
-        const expenses = await query;
-
-        // Si no hay gastos devueltos, verificamos si es porque no tienen o porque no comparten casa
-        if (expenses.length === 0) {
-            const sharedHouses = await db("HouseMembers")
-                .whereIn('id_house', function() {
-                    this.select('id_house').from('HouseMembers').where('id_user', user.id);
-                })
-                .where('id_user', userId)
-                .first();
-            
-            if (!sharedHouses) {
-                throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
-            }
+        // Verificamos si comparten casa
+        const sharedHouses = await db("HouseMembers")
+            .whereIn('id_house', function() {
+                this.select('id_house').from('HouseMembers').where('id_user', user.id);
+            })
+            .where('id_user', userId)
+            .first();
+        
+        if (!sharedHouses) {
+            throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
         }
-        return expenses;
+    }
+
+    if (filters.minAmount) {
+        query = query.where('e.amount', '>=', filters.minAmount);
+    }
+    if (filters.maxAmount) {
+        query = query.where('e.amount', '<=', filters.maxAmount);
+    }
+    if (filters.search) {
+        query = query.where('e.description', 'like', `%${filters.search}%`);
+    }
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'asc' ? 'asc' : 'desc';
+        query = query.orderBy(`e.${filters.sortBy}`, order);
     }
 
     return await query;

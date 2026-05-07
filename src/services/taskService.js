@@ -1,6 +1,6 @@
 const { db } = require("../config/database");
 
-const findAllTasks = async (user) => {
+const findAllTasks = async (user, filters = {}) => {
     let query = db("Tasks as t")
         .select(
             "t.id_task",
@@ -22,6 +22,24 @@ const findAllTasks = async (user) => {
                 this.select('id_house').from('HouseMembers').where('id_user', user.id);
             }).orWhere('t.id_user', user.id);
         });
+    }
+
+    //Buscador y filtado dinamico
+    //buscar por estado
+    if (filters.state) {
+        query = query.where('t.state', filters.state);
+    }
+    //buscar por nombre
+    if (filters.search) {
+        query = query.where(function() {
+            this.where('t.name', 'like', `%${filters.search}%`)
+                .orWhere('t.description', 'like', `%${filters.search}%`);
+        });
+    }
+    //ordenar
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'desc' ? 'desc' : 'asc';
+        query = query.orderBy(`t.${filters.sortBy}`, order);
     }
 
     return await query;
@@ -141,7 +159,7 @@ const deleteTask = async (taskId, user) => {
     return { message: "Tarea eliminada correctamente" };
 }
 
-const findTasksByHouse = async (houseId, user) => {
+const findTasksByHouse = async (houseId, user, filters = {}) => {
     // Verificar acceso a la casa
     if (user.rol !== 'admin') {
         const membership = await db("HouseMembers")
@@ -152,7 +170,7 @@ const findTasksByHouse = async (houseId, user) => {
         }
     }
 
-    const tasks = await db("Tasks as t")
+    let query = db("Tasks as t")
         .select(
             "t.id_task",
             "t.name",
@@ -165,10 +183,25 @@ const findTasksByHouse = async (houseId, user) => {
         )
         .leftJoin("Users as u", "t.id_user", "u.id_user")
         .where({ "t.id_house": houseId });
-    return tasks;
+        
+    if (filters.state) {
+        query = query.where('t.state', filters.state);
+    }
+    if (filters.search) {
+        query = query.where(function() {
+            this.where('t.name', 'like', `%${filters.search}%`)
+                .orWhere('t.description', 'like', `%${filters.search}%`);
+        });
+    }
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'desc' ? 'desc' : 'asc';
+        query = query.orderBy(`t.${filters.sortBy}`, order);
+    }
+
+    return await query;
 }
 
-const findTasksByUser = async (userId, user) => {
+const findTasksByUser = async (userId, user, filters = {}) => {
     let query = db("Tasks as t")
         .select(
             "t.id_task",
@@ -190,22 +223,31 @@ const findTasksByUser = async (userId, user) => {
             this.select('id_house').from('HouseMembers').where('id_user', user.id);
         });
 
-        const tasks = await query;
-
-        // Si no hay tareas devueltas, verificamos si es porque no tienen o porque no comparten casa
-        if (tasks.length === 0) {
-            const sharedHouses = await db("HouseMembers")
-                .whereIn('id_house', function() {
-                    this.select('id_house').from('HouseMembers').where('id_user', user.id);
-                })
-                .where('id_user', userId)
-                .first();
-            
-            if (!sharedHouses) {
-                throw { status: 403, message: "No tienes permiso para ver las tareas de este usuario" };
-            }
+        // Verificamos primero si comparten casa para evitar fuga de información
+        const sharedHouses = await db("HouseMembers")
+            .whereIn('id_house', function() {
+                this.select('id_house').from('HouseMembers').where('id_user', user.id);
+            })
+            .where('id_user', userId)
+            .first();
+        
+        if (!sharedHouses) {
+            throw { status: 403, message: "No tienes permiso para ver las tareas de este usuario" };
         }
-        return tasks;
+    }
+
+    if (filters.state) {
+        query = query.where('t.state', filters.state);
+    }
+    if (filters.search) {
+        query = query.where(function() {
+            this.where('t.name', 'like', `%${filters.search}%`)
+                .orWhere('t.description', 'like', `%${filters.search}%`);
+        });
+    }
+    if (filters.sortBy) {
+        const order = filters.order && filters.order.toLowerCase() === 'desc' ? 'desc' : 'asc';
+        query = query.orderBy(`t.${filters.sortBy}`, order);
     }
 
     return await query;

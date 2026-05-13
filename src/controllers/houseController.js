@@ -19,7 +19,7 @@ const getAllHouses = async (req, res, next) => {
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Casas obtenidas correctamente`,
+      message: `Houses retrieved successfully`,
       data: houses,
     });
   } catch (error) {
@@ -41,13 +41,13 @@ const getHouseById = async (req, res, next) => {
       res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Casa con id ${houseId} no encontrada`,
+        message: `House with id ${houseId} not found`,
       });
     }
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Casa con id ${houseId} obtenida correctamente`,
+      message: `House with id ${houseId} retrieved successfully`,
       data: house,
     });
   } catch (error) {
@@ -74,7 +74,7 @@ const postHouse = async (req, res, next) => {
     res.status(201).json({
       code: 201,
       title: "Created",
-      message: `Casa con id ${newId} creada correctamente`,
+      message: `House with id ${newId} created successfully`,
       data: newHouse,
     });
   } catch (error) {
@@ -99,14 +99,14 @@ const putHouse = async (req, res, next) => {
       res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Casa con id ${houseId} no encontrada`,
+        message: `House with id ${houseId} not found`,
       });
     }
 
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Casa con id ${houseId} actualizada correctamente`,
+      message: `House with id ${houseId} updated successfully`,
       data: updatedHouse,
     });
   } catch (error) {
@@ -129,13 +129,13 @@ const deleteAHouse = async (req, res, next) => {
       res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Casa con id ${houseId} no encontrada`,
+        message: `House with id ${houseId} not found`,
       });
     }
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Casa con id ${houseId} eliminada correctamente`,
+      message: `House with id ${houseId} deleted successfully`,
     });
   } catch (error) {
     next(error);

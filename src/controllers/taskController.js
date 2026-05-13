@@ -21,7 +21,7 @@ const getAllTasks = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: "Tareas obtenidas correctamente",
+            message: "Tasks retrieved successfully",
             data: tasks,
         });
     } catch (error) {
@@ -43,7 +43,7 @@ const getTaskById = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Tarea con id ${taskId} obtenida correctamente`,
+            message: `Task with id ${taskId} retrieved successfully`,
             data: task,
         });
     } catch (error) {
@@ -70,7 +70,7 @@ const postTask = async (req, res, next) => {
         res.status(201).json({
             code: 201,
             title: "Created",
-            message: `Tarea con id ${newId} creada correctamente`,
+            message: `Task with id ${newId} created successfully`,
             data: newTask,
         });
     } catch (error) {
@@ -95,7 +95,7 @@ const putTask = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Tarea con id ${taskId} actualizada correctamente`,
+            message: `Task with id ${taskId} updated successfully`,
             data: updatedTask,
         });
     } catch (error) {
@@ -117,7 +117,7 @@ const deleteATask = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Tarea con id ${taskId} eliminada correctamente`,
+            message: `Task with id ${taskId} deleted successfully`,
         });
     } catch (error) {
         next(error);
@@ -134,7 +134,7 @@ const getTasksByHouse = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Tareas de la casa ${houseId} obtenidas correctamente`,
+            message: `Tasks for house ${houseId} retrieved successfully`,
             data: tasks,
         });
     } catch (error) {
@@ -152,7 +152,7 @@ const getTasksByUser = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Tareas del usuario ${userId} obtenidas correctamente`,
+            message: `Tasks for user ${userId} retrieved successfully`,
             data: tasks,
         });
     } catch (error) {

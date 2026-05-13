@@ -20,13 +20,13 @@ const getMembersByHouseId = async (req, res, next) => {
             return res.status(404).json({
                 code: 404,
                 title: "Not Found",
-                message: `No se encontraron miembros para la casa con id ${id_house}`,
+                message: `No members found for house with id ${id_house}`,
             });
         }
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Miembros de la casa con id ${id_house} obtenidos correctamente`,
+            message: `Members of house with id ${id_house} retrieved successfully`,
             data: members,
         });
     } catch (error) {
@@ -48,13 +48,13 @@ const getHousesByUserId = async (req, res, next) => {
             return res.status(404).json({
                 code: 404,
                 title: "Not Found",
-                message: `No se encontraron casas para el usuario con id ${id_user}`,
+                message: `No houses found for user with id ${id_user}`,
             });
         }
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Casas del usuario con id ${id_user} obtenidos correctamente`,
+            message: `Houses for user with id ${id_user} retrieved successfully`,
             data: houses,
         });
     } catch (error) {
@@ -77,13 +77,13 @@ const postHouseMember = async (req, res, next) => {
             return res.status(404).json({
                 code: 404,
                 title: "Not Found",
-                message: `No se pudo agregar el usuario a la casa`,
+                message: `Could not add user to the house`,
             });
         }
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Usuario agregado a la casa correctamente`,
+            message: `User added to the house successfully`,
             data: houseMember,
         });
     } catch (error) {
@@ -106,13 +106,13 @@ const deleteHouseMember = async (req, res, next) => {
             return res.status(404).json({
                 code: 404,
                 title: "Not Found",
-                message: `No se pudo eliminar el usuario de la casa`,
+                message: `Could not remove user from the house`,
             });
         }
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Usuario con id ${id_user} eliminado de la casa con id ${id_house} correctamente`,
+            message: `User with id ${id_user} removed from house with id ${id_house} successfully`,
         });
     } catch (error) {
         next(error);

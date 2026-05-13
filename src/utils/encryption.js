@@ -14,7 +14,7 @@ const hashPassword = async (password) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
   } catch (error) {
-    throw new Error("Error al hashear la contraseña");
+    throw new Error("Failure to hash password");
   }
 };
 
@@ -29,7 +29,7 @@ const comparePassword = async (password, hashedPassword) => {
     const isMatch = await bcrypt.compare(password, hashedPassword);
     return isMatch;
   } catch (error) {
-    throw new Error("Error al comparar contraseñas");
+    throw new Error("Failure to compare passwords");
   }
 };
 
@@ -48,41 +48,41 @@ const validatePasswordStrength = (password) => {
   if (password.length < minLength) {
     return {
       isValid: false,
-      message: `La contraseña debe tener al menos ${minLength} caracteres`,
+      message: `The password must be at least ${minLength} characters long`,
     };
   }
 
   if (!hasUpperCase) {
     return {
       isValid: false,
-      message: "La contraseña debe contener al menos una letra mayúscula",
+      message: "The password must contain at least one uppercase letter",
     };
   }
 
   if (!hasLowerCase) {
     return {
       isValid: false,
-      message: "La contraseña debe contener al menos una letra minúscula",
+      message: "The password must contain at least one lowercase letter",
     };
   }
 
   if (!hasNumbers) {
     return {
       isValid: false,
-      message: "La contraseña debe contener al menos un número",
+      message: "The password must contain at least one number",
     };
   }
 
   if (!hasSpecialChar) {
     return {
       isValid: false,
-      message: "La contraseña debe contener al menos un carácter especial",
+      message: "The password must contain at least one special character",
     };
   }
 
   return {
     isValid: true,
-    message: "Contraseña válida",
+    message: "Valid password",
   };
 };
 

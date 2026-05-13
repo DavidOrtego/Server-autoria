@@ -9,6 +9,7 @@ const findAllExpenses = async (user, filters = {}) => {
             "e.date",
             "e.id_user",
             "u.name as user_name",
+            "u.image as user_image",
             "e.id_house",
             "h.name as house_name"
         )
@@ -53,6 +54,7 @@ const findExpenseById = async (expenseId, user) => {
             "e.date",
             "e.id_user",
             "u.name as user_name",
+            "u.image as user_image",
             "e.id_house",
             "h.name as house_name"
         )
@@ -71,7 +73,7 @@ const findExpenseById = async (expenseId, user) => {
     const expense = await query.first();
 
     if (!expense) {
-        throw { status: 404, message: "Gasto no encontrado o sin acceso" };
+        throw { status: 404, message: "Expense not found or unauthorized access" };
     }
 
     return expense;
@@ -84,7 +86,7 @@ const createExpense = async (expenseData, user) => {
             .where({ id_house: expenseData.id_house, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes permiso para registrar gastos en esta casa" };
+            throw { status: 403, message: "You don't have permission to register expenses in this house" };
         }
     }
 
@@ -94,7 +96,7 @@ const createExpense = async (expenseData, user) => {
         .first();
     
     if (!targetUserMembership) {
-        throw { status: 400, message: "El usuario asignado no pertenece a esta casa" };
+        throw { status: 400, message: "The assigned user does not belong to this house" };
     }
 
     // Sanitizar datos para insertar solo campos válidos
@@ -131,7 +133,7 @@ const updateExpense = async (expenseId, newExpenseData, user) => {
                 .first();
             
             if (!targetMembership) {
-                throw { status: 400, message: "El usuario asignado no pertenece a esa casa" };
+                throw { status: 400, message: "The assigned user does not belong to that house" };
             }
         }
 
@@ -143,7 +145,7 @@ const deleteExpense = async (expenseId, user) => {
     await findExpenseById(expenseId, user);
     
     await db("Expenses").where({ id_expense: expenseId }).del();
-    return { message: "Gasto eliminado correctamente" };
+    return { message: "Expense deleted successfully" };
 }
 
 const findExpensesByHouse = async (houseId, user, filters = {}) => {
@@ -153,7 +155,7 @@ const findExpensesByHouse = async (houseId, user, filters = {}) => {
             .where({ id_house: houseId, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes acceso a los gastos de esta casa" };
+            throw { status: 403, message: "You don't have access to the expenses of this house" };
         }
     }
 
@@ -165,6 +167,7 @@ const findExpensesByHouse = async (houseId, user, filters = {}) => {
             "e.date",
             "e.id_user",
             "u.name as user_name",
+            "u.image as user_image",
             "e.id_house"
         )
         .join("Users as u", "e.id_user", "u.id_user")
@@ -196,6 +199,7 @@ const findExpensesByUser = async (userId, user, filters = {}) => {
             "e.date",
             "e.id_user",
             "u.name as user_name",
+            "u.image as user_image",
             "e.id_house",
             "h.name as house_name"
         )
@@ -219,7 +223,7 @@ const findExpensesByUser = async (userId, user, filters = {}) => {
             .first();
         
         if (!sharedHouses) {
-            throw { status: 403, message: "No tienes permiso para ver los gastos de este usuario" };
+            throw { status: 403, message: "You don't have permission to view the expenses of this user" };
         }
     }
 

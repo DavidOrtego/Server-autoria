@@ -18,7 +18,7 @@ class AuthController {
         code: 201,
         title: "Created",
         success: true,
-        message: "Usuario registrado correctamente",
+        message: "User registered successfully",
         data: result,
       });
     } catch (error) {
@@ -43,7 +43,7 @@ class AuthController {
         code: 200,
         title: "Success",
         success: true,
-        message: "Login exitoso",
+        message: "Login successful",
         data: result,
       });
     } catch (error) {

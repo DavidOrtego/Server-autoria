@@ -11,7 +11,7 @@ const authenticateToken = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Acceso denegado. No se proporcionó un token válido.",
+        message: "Access denied. No valid token provided.",
       });
     }
 
@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: error.message || "Token inválido o expirado",
+      message: error.message || "Invalid or expired token",
     });
   }
 };
@@ -36,14 +36,14 @@ const isAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      message: "No autenticado",
+      message: "Not authenticated",
     });
   }
  
   if (req.user.rol !== "admin") {
     return res.status(403).json({
       success: false,
-      message: "Acceso denegado. Se requieren permisos de administrador.",
+      message: "Access denied. Administrator permissions required.",
     });
   }
 

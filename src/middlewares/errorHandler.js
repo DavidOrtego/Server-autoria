@@ -6,7 +6,7 @@ const handleValidationErrors = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      message: "Errores de validación",
+      message: "Validation errors",
       errors: errors.array().map((error) => ({
         field: error.path || error.param,
         message: error.msg,
@@ -25,7 +25,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.code === "ER_DUP_ENTRY") {
     return res.status(409).json({
       success: false,
-      message: "El recurso ya existe",
+      message: "The resource already exists",
       error: err.sqlMessage,
     });
   }
@@ -34,7 +34,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.code && err.code.startsWith("ER_")) {
     return res.status(500).json({
       success: false,
-      message: "Error en la base de datos",
+      message: "Database error",
       error:
         process.env.NODE_ENV === "development" ? err.sqlMessage : undefined,
     });
@@ -44,14 +44,14 @@ const errorHandler = (err, req, res, next) => {
   if (err.status) {
     return res.status(err.status).json({
       success: false,
-      message: err.message || "Error en la petición",
+      message: err.message || "Request error",
     });
   }
 
   // Error por defecto
   res.status(500).json({
     success: false,
-    message: "Error interno del servidor",
+    message: "Internal server error",
     error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 };
@@ -60,7 +60,7 @@ const errorHandler = (err, req, res, next) => {
 const notFound = (req, res) => {
   res.status(404).json({
     success: false,
-    message: "Ruta no encontrada",
+    message: "Route not found",
   });
 };
 

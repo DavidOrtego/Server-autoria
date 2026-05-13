@@ -19,7 +19,7 @@ const getAllUsers = async (req, res, next) => {
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Usuarios obtenidos correctamente`,
+      message: `Users retrieved successfully`,
       data: users,
     });
   } catch (error) {
@@ -41,13 +41,13 @@ const getUserById = async (req, res, next) => {
       return res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Usuario con id ${userId} no encontrado`,
+        message: `User with id ${userId} not found`,
       });
     }
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Usuario con id ${userId} obtenido correctamente`,
+      message: `User with id ${userId} retrieved successfully`,
       data: user,
     });
   } catch (error) {
@@ -74,13 +74,13 @@ const putUser = async (req, res, next) => {
       return res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Usuario con id ${userId} no encontrado`,
+        message: `User with id ${userId} not found`,
       });
     }
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Usuario con id ${userId} actualizado correctamente`,
+      message: `User with id ${userId} updated successfully`,
       data: updatedUser,
     });
   } catch (error) {
@@ -103,13 +103,13 @@ const deleteAUser = async (req, res, next) => {
       return res.status(404).json({
         code: 404,
         title: "Not Found",
-        message: `Usuario con id ${userId} no encontrado`,
+        message: `User with id ${userId} not found`,
       });
     }
     res.status(200).json({
       code: 200,
       title: "Success",
-      message: `Usuario con id ${userId} eliminado correctamente`,
+      message: `User with id ${userId} deleted successfully`,
     });
   } catch (error) {
     next(error);

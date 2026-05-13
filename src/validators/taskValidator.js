@@ -3,41 +3,41 @@ const { body, param } = require("express-validator");
 const taskIdValidator = [
     param("taskId")
         .isInt({ min: 1 })
-        .withMessage("El ID de la tarea debe ser un número entero positivo"),
+        .withMessage("Task ID must be a positive integer"),
 ];
 
 const postTaskValidator = [
     body("name")
         .trim()
         .notEmpty()
-        .withMessage("El nombre de la tarea no puede estar vacío.")
+        .withMessage("Task name cannot be empty.")
         .isLength({ max: 100 })
-        .withMessage("El nombre no puede exceder los 100 caracteres."),
+        .withMessage("Name cannot exceed 100 characters."),
 
     body("description")
         .optional()
         .trim()
         .isLength({ max: 255 })
-        .withMessage("La descripción no puede exceder los 255 caracteres."),
+        .withMessage("Description cannot exceed 255 characters."),
 
     body("state")
         .optional()
-        .isIn(["pending", "in_progress", "completed"])
-        .withMessage("Estado inválido. Debe ser 'pending', 'in_progress' o 'completed'."),
+        .isIn(["pending", "complete"])
+        .withMessage("Invalid state. Must be 'pending' or 'complete'."),
 
     body("expiration_date")
         .optional()
         .isISO8601()
-        .withMessage("La fecha de expiración debe ser una fecha válida (ISO8601)."),
+        .withMessage("Expiration date must be a valid date (ISO8601)."),
 
     body("id_house")
         .isInt({ min: 1 })
-        .withMessage("El ID de la casa debe ser un número entero positivo."),
+        .withMessage("House ID must be a positive integer."),
 
     body("id_user")
         .optional({ nullable: true })
         .isInt({ min: 1 })
-        .withMessage("El ID del usuario debe ser un número entero positivo."),
+        .withMessage("User ID must be a positive integer."),
 ];
 
 const putTaskValidator = [
@@ -45,35 +45,35 @@ const putTaskValidator = [
         .optional()
         .trim()
         .notEmpty()
-        .withMessage("El nombre de la tarea no puede estar vacío.")
+        .withMessage("Task name cannot be empty.")
         .isLength({ max: 100 })
-        .withMessage("El nombre no puede exceder los 100 caracteres."),
+        .withMessage("Name cannot exceed 100 characters."),
 
     body("description")
         .optional()
         .trim()
         .isLength({ max: 255 })
-        .withMessage("La descripción no puede exceder los 255 caracteres."),
+        .withMessage("Description cannot exceed 255 characters."),
 
     body("state")
         .optional()
-        .isIn(["pending", "in_progress", "completed"])
-        .withMessage("Estado inválido. Debe ser 'pending', 'in_progress' o 'completed'."),
+        .isIn(["pending", "complete"])
+        .withMessage("Invalid state. Must be 'pending' or 'complete'."),
 
     body("expiration_date")
         .optional()
         .isISO8601()
-        .withMessage("La fecha de expiración debe ser una fecha válida (ISO8601)."),
+        .withMessage("Expiration date must be a valid date (ISO8601)."),
 
     body("id_house")
         .optional()
         .isInt({ min: 1 })
-        .withMessage("El ID de la casa debe ser un número entero positivo."),
+        .withMessage("House ID must be a positive integer."),
 
     body("id_user")
         .optional({ nullable: true })
         .isInt({ min: 1 })
-        .withMessage("El ID del usuario debe ser un número entero positivo."),
+        .withMessage("User ID must be a positive integer."),
 ];
 
 module.exports = {

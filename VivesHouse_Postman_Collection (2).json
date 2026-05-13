@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "8a7c2e3a-1234-4567-89ab-cdef01234567",
+		"name": "Vives House API",
+		"description": "Colección completa para probar la API de Vives House, incluyendo gestión de usuarios, casas, tareas y gastos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Hugo Test\",\n    \"email\": \"hugo@example.com\",\n    \"password\": \"password123\",\n    \"rol\": \"member\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"event": [
+							{
+								"listen": "test",
+								"script": {
+									"exec": [
+										"var jsonData = pm.response.json();\r",
+										"if (jsonData.data && jsonData.data.tokens && jsonData.data.tokens.token) {\r",
+										"    pm.collectionVariables.set(\"token\", jsonData.data.tokens.token);\r",
+										"}"
+									],
+									"type": "text/javascript"
+								}
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"if (jsonData.data && jsonData.data.tokens && jsonData.data.tokens.token) {\r",
+									"    pm.collectionVariables.set(\"token\", jsonData.data.tokens.token);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hugo@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Me (User Data)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "target_user_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "target_house_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "target_expense_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "target_task_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

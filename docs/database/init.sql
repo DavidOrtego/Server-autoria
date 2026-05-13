@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS Houses (
     name VARCHAR(100) NOT NULL,
     address VARCHAR(255),
     number_of_rooms INT,
-    image VARCHAR(255),
     level INT DEFAULT 1
 );
 
@@ -37,7 +36,7 @@ CREATE TABLE IF NOT EXISTS Tasks (
     id_task INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    state ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
+    state ENUM('pending', 'complete') DEFAULT 'pending',
     expiration_date DATE,
     id_house INT NOT NULL,
     id_user INT,
@@ -64,7 +63,7 @@ CREATE PROCEDURE DeleteCompletedTasks()
 BEGIN
     -- Elimina las tareas completadas y su fecha límite pasó hace más de 30 días
     DELETE FROM Tasks 
-    WHERE state = 'completed' 
+    WHERE state = 'complete' 
     AND expiration_date < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
 END //
 
@@ -87,15 +86,15 @@ INSERT INTO Users (name, email, password, rol) VALUES
 
 INSERT INTO Houses (name, address, number_of_rooms, level) VALUES
 ('Piso Estudiantes', 'Calle Mayor 1', 3, 1),
-('Apartamento Centro', 'Plaza Sol 5', 2, 2),
-('Chalet Afueras', 'Avenida Robles 45', 4, 3),
-('Loft Moderno', 'Calle Gran Vía 12', 1, 1),
-('Piso Erasmus', 'Calle Universidad 8', 4, 1),
-('Casa Familiar', 'Calle Luna 33', 3, 2),
-('Estudio Playa', 'Paseo Marítimo 10', 1, 4),
+('Apartamento Centro', 'Plaza Sol 5', 2, 15),
+('Chalet Afueras', 'Avenida Robles 45', 4, 50),
+('Loft Moderno', 'Calle Gran Vía 12', 1, 40),
+('Piso Erasmus', 'Calle Universidad 8', 4, 30),
+('Casa Familiar', 'Calle Luna 33', 3, 20),
+('Estudio Playa', 'Paseo Marítimo 10', 1, 22),
 ('Ático Vistas', 'Plaza España 2', 2, 5),
-('Piso Compartido', 'Calle Cervantes 15', 3, 1),
-('Residencia', 'Avenida Campus 100', 10, 1);
+('Piso Compartido', 'Calle Cervantes 15', 3, 16),
+('Residencia', 'Avenida Campus 100', 10, 40);
 
 --Miembros (Asignando usuarios a pisos)
 INSERT INTO HouseMembers (id_house, id_user) VALUES
@@ -113,15 +112,15 @@ INSERT INTO HouseMembers (id_house, id_user) VALUES
 -- Tareas
 INSERT INTO Tasks (name, description, state, expiration_date, id_house, id_user) VALUES
 ('Limpiar cocina', 'Fregar platos y encimera', 'pending', '2026-05-01', 1, 1),
-('Bajar basura', 'Reciclar cartón y plástico', 'completed', '2026-04-25', 1, 2),
-('Comprar papel higiénico', 'Comprar pack de 24', 'in_progress', '2026-04-30', 1, 3),
+('Bajar basura', 'Reciclar cartón y plástico', 'complete', '2026-04-25', 1, 2),
+('Comprar papel higiénico', 'Comprar pack de 24', 'pending', '2026-04-30', 1, 3),
 ('Limpiar baños', 'Usar lejía en los dos baños', 'pending', '2026-05-02', 2, 4),
-('Pagar internet', 'Pagar recibo mensual', 'completed', '2026-04-20', 2, 5),
+('Pagar internet', 'Pagar recibo mensual', 'complete', '2026-04-20', 2, 5),
 ('Regar plantas', 'Las del balcón y salón', 'pending', '2026-05-03', 3, 6),
-('Fregar suelos', 'Todo el piso', 'in_progress', '2026-05-01', 3, 7),
+('Fregar suelos', 'Todo el piso', 'pending', '2026-05-01', 3, 7),
 ('Limpiar cristales', 'Ventanas del salón', 'pending', '2026-05-05', 4, 8),
 ('Organizar fiesta', 'Comprar bebidas y snacks', 'pending', '2026-05-10', 5, 9),
-('Lavar cortinas', 'Lavadora a 30 grados', 'completed', '2026-04-15', 5, 10);
+('Lavar cortinas', 'Lavadora a 30 grados', 'complete', '2026-04-15', 5, 10);
 
 -- Gastos
 INSERT INTO Expenses (amount, description, date, id_user, id_house) VALUES

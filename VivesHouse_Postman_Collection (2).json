@@ -263,6 +263,185 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Houses",
+			"item": [
+				{
+					"name": "Get All Houses",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/houses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"houses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get House By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/houses/:houseId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"houses",
+								":houseId"
+							],
+							"variable": [
+								{
+									"key": "houseId",
+									"value": "{{target_house_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create House",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Nueva Mansión\",\n    \"address\": \"Avenida Siempre Viva 742\",\n    \"number_of_rooms\": 5,\n    \"level\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/houses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"houses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update House",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Mansión Renovada\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/houses/:houseId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"houses",
+								":houseId"
+							],
+							"variable": [
+								{
+									"key": "houseId",
+									"value": "{{target_house_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete House",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/houses/:houseId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"houses",
+								":houseId"
+							],
+							"variable": [
+								{
+									"key": "houseId",
+									"value": "{{target_house_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [

@@ -21,7 +21,7 @@ const getAllExpenses = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: "Gastos obtenidos correctamente",
+            message: "Expenses retrieved successfully",
             data: expenses,
         });
     } catch (error) {
@@ -43,7 +43,7 @@ const getExpenseById = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Gasto con id ${expenseId} obtenido correctamente`,
+            message: `Expense with id ${expenseId} retrieved successfully`,
             data: expense,
         });
     } catch (error) {
@@ -70,7 +70,7 @@ const postExpense = async (req, res, next) => {
         res.status(201).json({
             code: 201,
             title: "Created",
-            message: `Gasto con id ${newId} creado correctamente`,
+            message: `Expense with id ${newId} created successfully`,
             data: newExpense,
         });
     } catch (error) {
@@ -95,7 +95,7 @@ const putExpense = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Gasto con id ${expenseId} actualizado correctamente`,
+            message: `Expense with id ${expenseId} updated successfully`,
             data: updatedExpense,
         });
     } catch (error) {
@@ -117,7 +117,7 @@ const deleteAExpense = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Gasto con id ${expenseId} eliminado correctamente`,
+            message: `Expense with id ${expenseId} deleted successfully`,
         });
     } catch (error) {
         next(error);
@@ -134,7 +134,7 @@ const getExpensesByHouse = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Gastos de la casa ${houseId} obtenidos correctamente`,
+            message: `Expenses for house ${houseId} retrieved successfully`,
             data: expenses,
         });
     } catch (error) {
@@ -152,7 +152,7 @@ const getExpensesByUser = async (req, res, next) => {
         res.status(200).json({
             code: 200,
             title: "Success",
-            message: `Gastos del usuario ${userId} obtenidos correctamente`,
+            message: `Expenses for user ${userId} retrieved successfully`,
             data: expenses,
         });
     } catch (error) {

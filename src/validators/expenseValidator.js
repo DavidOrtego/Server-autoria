@@ -3,70 +3,70 @@ const { body, param } = require("express-validator");
 const expenseIdValidator = [
     param("expenseId")
         .isInt({ min: 1 })
-        .withMessage("El ID del gasto debe ser un número entero positivo"),
+        .withMessage("Expense ID must be a positive integer"),
 ];
 
 const postExpenseValidator = [
     body("amount")
         .isDecimal({ decimal_digits: '0,2' })
-        .withMessage("El monto debe ser un número decimal válido.")
+        .withMessage("Amount must be a valid decimal number.")
         .notEmpty()
-        .withMessage("El monto es obligatorio."),
+        .withMessage("Amount is required."),
 
     body("description")
         .trim()
         .notEmpty()
-        .withMessage("La descripción es obligatoria.")
+        .withMessage("Description is required.")
         .isLength({ max: 255 })
-        .withMessage("La descripción no puede exceder los 255 caracteres."),
+        .withMessage("Description cannot exceed 255 characters."),
 
     body("date")
         .isISO8601()
-        .withMessage("La fecha debe ser una fecha válida (ISO8601).")
+        .withMessage("Date must be a valid date (ISO8601).")
         .notEmpty()
-        .withMessage("La fecha es obligatoria."),
+        .withMessage("Date is required."),
 
     body("id_user")
         .isInt({ min: 1 })
-        .withMessage("El ID del usuario debe ser un número entero positivo.")
+        .withMessage("User ID must be a positive integer.")
         .notEmpty()
-        .withMessage("El ID del usuario es obligatorio."),
+        .withMessage("User ID is required."),
 
     body("id_house")
         .isInt({ min: 1 })
-        .withMessage("El ID de la casa debe ser un número entero positivo.")
+        .withMessage("House ID must be a positive integer.")
         .notEmpty()
-        .withMessage("El ID de la casa es obligatorio."),
+        .withMessage("House ID is required."),
 ];
 
 const putExpenseValidator = [
     body("amount")
         .optional()
         .isDecimal({ decimal_digits: '0,2' })
-        .withMessage("El monto debe ser un número decimal válido."),
+        .withMessage("Amount must be a valid decimal number."),
 
     body("description")
         .optional()
         .trim()
         .notEmpty()
-        .withMessage("La descripción no puede estar vacía.")
+        .withMessage("Description cannot be empty.")
         .isLength({ max: 255 })
-        .withMessage("La descripción no puede exceder los 255 caracteres."),
+        .withMessage("Description cannot exceed 255 characters."),
 
     body("date")
         .optional()
         .isISO8601()
-        .withMessage("La fecha debe ser una fecha válida (ISO8601)."),
+        .withMessage("Date must be a valid date (ISO8601)."),
 
     body("id_user")
         .optional()
         .isInt({ min: 1 })
-        .withMessage("El ID del usuario debe ser un número entero positivo."),
+        .withMessage("User ID must be a positive integer."),
 
     body("id_house")
         .optional()
         .isInt({ min: 1 })
-        .withMessage("El ID de la casa debe ser un número entero positivo."),
+        .withMessage("House ID must be a positive integer."),
 ];
 
 module.exports = {

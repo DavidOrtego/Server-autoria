@@ -5,52 +5,52 @@ const registerValidators = [
     body("name")
         .trim()
         .notEmpty()
-        .withMessage("El nombre es requerido.")
+        .withMessage("Name is required.")
         .isLength({ max: 100 })
-        .withMessage("El nombre no puede exceder los 100 caracteres."),
+        .withMessage("Name cannot exceed 100 characters."),
 
 
     body("email")
         .trim()
         .notEmpty()
-        .withMessage("El correo electrónico es requerido.")
+        .withMessage("Email is required.")
         .isEmail()
-        .withMessage("Debe ser un correo electrónico válido.")
+        .withMessage("Must be a valid email.")
         .isLength({ max: 150 })
-        .withMessage("El correo electrónico no puede exceder los 150 caracteres."),
+        .withMessage("Email cannot exceed 150 characters."),
 
 
     body("password")
         .trim()
         .notEmpty()
-        .withMessage("La contraseña es requerida.")
+        .withMessage("Password is required.")
         .isLength({ min: 8 })
-        .withMessage("La contraseña debe tener al menos 8 caracteres."),
+        .withMessage("Password must have at least 8 characters."),
 
 
     body("rol")
         .optional()
         .isIn(["admin", "member"])
-        .withMessage("Rol inválido"),
+        .withMessage("Invalid role"),
 ];
 
 const loginValidators = [
     body("email")
         .trim()
         .notEmpty()
-        .withMessage("El correo electrónico es requerido.")
+        .withMessage("Email is required.")
         .isEmail()
-        .withMessage("Debe ser un correo electrónico válido.")
+        .withMessage("Must be a valid email.")
         .isLength({ max: 150 })
-        .withMessage("El correo electrónico no puede exceder los 150 caracteres."),
+        .withMessage("Email cannot exceed 150 characters."),
 
 
     body("password")
         .trim()
         .notEmpty()
-        .withMessage("La contraseña es requerida.")
+        .withMessage("Password is required.")
         .isLength({ min: 8 })
-        .withMessage("La contraseña debe tener al menos 8 caracteres."),
+        .withMessage("Password must have at least 8 characters."),
 ];
 
 module.exports = {

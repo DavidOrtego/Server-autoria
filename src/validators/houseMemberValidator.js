@@ -3,26 +3,26 @@ const { param, body } = require("express-validator");
 // Validar el ID de la casa
 const idHouseParamValidator = [
     param("id_house")
-        .exists().withMessage("El ID de la casa es obligatorio")
-        .isInt({ min: 1 }).withMessage("El ID de la casa debe ser un número entero positivo"),
+        .exists().withMessage("House ID is required")
+        .isInt({ min: 1 }).withMessage("House ID must be a positive integer"),
 ];
 
 // Validar el ID del usuario
 const idUserParamValidator = [
     param("id_user")
-        .exists().withMessage("El ID del usuario es obligatorio")
-        .isInt({ min: 1 }).withMessage("El ID del usuario debe ser un número entero positivo"),
+        .exists().withMessage("User ID is required")
+        .isInt({ min: 1 }).withMessage("User ID must be a positive integer"),
 ];
 
 // Validar al crear un miembro
 const postHouseMemberValidator = [
     body("id_house")
-        .exists().withMessage("El ID de la casa es obligatorio")
-        .isInt({ min: 1 }).withMessage("El ID de la casa debe ser un número entero positivo"),
+        .exists().withMessage("House ID is required")
+        .isInt({ min: 1 }).withMessage("House ID must be a positive integer"),
     body("email")
-        .exists().withMessage("El email es obligatorio")
+        .exists().withMessage("Email is required")
         .trim()
-        .isEmail().withMessage("Debe ser un email válido"),
+        .isEmail().withMessage("Must be a valid email"),
 ];
 
 module.exports = {

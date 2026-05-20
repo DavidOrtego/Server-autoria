@@ -40,14 +40,8 @@ app.use("/api/house-members", houseMemberRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/expenses", expenseRoutes);
 
-// Ruta de prueba (Ping)
-app.get("/api/ping", (req, res) => {
-  res.json({ mensaje: "¡Pong! El servidor de Vives está vivo." });
-});
 
-// -----------------------------------------
-// MANEJO DE ERRORES (Siempre va al final)
-// -----------------------------------------
+// MANEJO DE ERRORES
 
 // 1. Si la petición no coincide con ninguna ruta de arriba, es un 404
 app.use(notFound);

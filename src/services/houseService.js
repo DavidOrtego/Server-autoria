@@ -6,7 +6,6 @@ const findAllHouses = async (user) => {
         "name",
         "address",
         "number_of_rooms",
-        "image",
         "level"
     );
 
@@ -26,7 +25,6 @@ const findHouseById = async (houseId, user) => {
             "name",
             "address",
             "number_of_rooms",
-            "image",
             "level"
         )
         .where({ id_house: houseId });
@@ -40,7 +38,7 @@ const findHouseById = async (houseId, user) => {
     const house = await query.first();
 
     if (!house) {
-        throw { status: 404, message: "Casa no encontrada o sin acceso" };
+        throw { status: 404, message: "House not found or unauthorized access" };
     }
 
     return house;
@@ -53,7 +51,7 @@ const createHouse = async (houseData, userId) => {
             .first();
         
         if (existingHouse) {
-            throw { status: 400, message: "La casa ya existe" };
+            throw { status: 400, message: "The house already exists" };
         }
 
         const [newId] = await trx("Houses").insert(houseData);
@@ -76,7 +74,6 @@ const updateHouse = async (houseId, newHouseData, user) => {
     if (newHouseData.name) updateData.name = newHouseData.name;
     if (newHouseData.address) updateData.address = newHouseData.address;
     if (newHouseData.number_of_rooms) updateData.number_of_rooms = newHouseData.number_of_rooms;
-    if (newHouseData.image) updateData.image = newHouseData.image;
     if (newHouseData.level) updateData.level = newHouseData.level;
 
     if (Object.keys(updateData).length > 0) {
@@ -85,24 +82,33 @@ const updateHouse = async (houseId, newHouseData, user) => {
 }
 
 const deleteHouse = async (houseId, user) => {
-    // Verificar si existe y tiene acceso (en este caso delete suele ser admin, pero lo protegemos)
+    // Verificar si existe y tiene acceso
     await findHouseById(houseId, user);
-    // Funciones de integridad de borrado
-    // Comprobar si hay tareas en esta casa
-    const tasksCount = await db("Tasks").where({ id_house: houseId }).count('* as total').first();
-    //Comprobar si hay gastos en esta casa
-    const expensesCount = await db("Expenses").where({ id_house: houseId }).count('* as total').first();
-    // Si hay datos, evitamos el borrado y avisamos al usuario
-    if (tasksCount.total > 0 || expensesCount.total > 0) {
+    
+    // 1. Comprobar si hay más de un miembro en la casa
+    const membersCount = await db("HouseMembers").where({ id_house: houseId }).count('* as total').first();
+    if (membersCount.total > 1) {
         throw {
             status: 409,
-            message: `No se puede borrar la casa porque aún tiene ${tasksCount.total} tareas y ${expensesCount.total} gastos asociados.`
+            message: "Cannot delete the house because there are still other members in it. Please remove them first or leave the house."
         };
     }
-    //Si todo está limpio, procedemos a borrar a los miembros y luego la casa
-    await db("HouseMembers").where({ id_house: houseId }).del();
-    const deletedCount = await db("Houses").where({ id_house: houseId }).del();
-    return deletedCount;
+
+    // Procedemos a borrar todo lo asociado a la casa en una transacción
+    return await db.transaction(async (trx) => {
+        // Borrar tareas asociadas
+        await trx("Tasks").where({ id_house: houseId }).del();
+        
+        // Borrar gastos asociados
+        await trx("Expenses").where({ id_house: houseId }).del();
+        
+        // Borrar miembros (en este punto solo debería quedar uno, el que lo borra)
+        await trx("HouseMembers").where({ id_house: houseId }).del();
+        
+        // Finalmente borrar la casa
+        const deletedCount = await trx("Houses").where({ id_house: houseId }).del();
+        return deletedCount;
+    });
 }
 
 module.exports = {

@@ -7,16 +7,15 @@ const PORT = config.service.port || 3000;
 
 const startServer = async () => {
   try {
-    // Intentamos una consulta simple para ver si Knex conecta con MariaDB
     await db.raw('SELECT 1+1 AS result');
-    console.log('✅ Conexión a la base de datos establecida correctamente con Knex.');
+    console.log('✅ Database connection established correctly with Knex.');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor Vives corriendo en http://localhost:${PORT}`);
-      console.log(`📖 Documentación disponible en el archivo openapi.yaml`);
+      console.log(`🚀 Vives Server running on http://localhost:${PORT}`);
+      console.log(`📖 Documentation available in the openapi.yaml file`);
     });
   } catch (error) {
-    console.error('❌ No se pudo conectar a la base de datos:', error.message);
+    console.error('❌ Failed to connect to the database:', error.message);
     process.exit(1);
   }
 };

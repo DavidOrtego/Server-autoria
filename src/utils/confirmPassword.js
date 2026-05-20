@@ -6,7 +6,7 @@
  */
 function confirmPassword(value, newPassword) {
   if (value !== newPassword) {
-    throw new Error("Las contraseñas no coinciden");
+    throw new Error("The passwords do not match");
   }
   return true;
 }

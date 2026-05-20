@@ -23,7 +23,7 @@ class AuthService {
         // verificar si ya existe el usuario
         const existingUser = await db("Users").where("email", email).first();
         if(existingUser){
-            throw { status: 409, message: "El email ya está en uso." };
+            throw { status: 409, message: "Email is already in use." };
         }
 
 
@@ -67,14 +67,14 @@ class AuthService {
         //comprobar si existe si existe el email
         const user = await db("Users").where({"email": email}).first();
         if(!user){
-            throw { status: 404, message: "Usuario no encontrado"}
+            throw { status: 404, message: "User not found"}
         }
 
 
         //comprobar la contraseña
         const isPasswordOk = await comparePassword(password, user.password);
         if(!isPasswordOk){
-            throw { status: 401, message: "Contraseña incorrecta"}
+            throw { status: 401, message: "Incorrect password"}
         }
 
 

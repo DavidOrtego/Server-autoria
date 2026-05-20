@@ -11,7 +11,8 @@ const findAllTasks = async (user, filters = {}) => {
             "t.id_house",
             "h.name as house_name",
             "t.id_user",
-            "u.name as user_name"
+            "u.name as user_name",
+            "u.image as user_image"
         )
         .leftJoin("Users as u", "t.id_user", "u.id_user")
         .join("Houses as h", "t.id_house", "h.id_house");
@@ -56,7 +57,8 @@ const findTaskById = async (taskId, user) => {
             "t.id_house",
             "h.name as house_name",
             "t.id_user",
-            "u.name as user_name"
+            "u.name as user_name",
+            "u.image as user_image"
         )
         .leftJoin("Users as u", "t.id_user", "u.id_user")
         .join("Houses as h", "t.id_house", "h.id_house")
@@ -73,7 +75,7 @@ const findTaskById = async (taskId, user) => {
     const task = await query.first();
 
     if (!task) {
-        throw { status: 404, message: "Tarea no encontrada o sin acceso" };
+        throw { status: 404, message: "Task not found or unauthorized access" };
     }
 
     return task;
@@ -86,7 +88,7 @@ const createTask = async (taskData, user) => {
             .where({ id_house: taskData.id_house, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes permiso para crear tareas en esta casa" };
+            throw { status: 403, message: "You don't have permission to create tasks in this house" };
         }
     }
 
@@ -97,7 +99,7 @@ const createTask = async (taskData, user) => {
             .first();
         
         if (!targetUserMembership) {
-            throw { status: 400, message: "El usuario asignado no pertenece a esta casa" };
+            throw { status: 400, message: "The assigned user does not belong to this house" };
         }
     }
 
@@ -119,7 +121,7 @@ const updateTask = async (taskId, newTaskData, user) => {
     const existingTask = await findTaskById(taskId, user);
     
     if (!existingTask) {
-        throw { status: 404, message: "Tarea no encontrada" };
+        throw { status: 404, message: "Task not found" };
     }
 
     const updateData = {};
@@ -142,7 +144,7 @@ const updateTask = async (taskId, newTaskData, user) => {
                     .first();
                 
                 if (!targetMembership) {
-                    throw { status: 400, message: "El usuario asignado no pertenece a esa casa" };
+                    throw { status: 400, message: "The assigned user does not belong to that house" };
                 }
             }
         }
@@ -156,7 +158,7 @@ const deleteTask = async (taskId, user) => {
     await findTaskById(taskId, user);
     
     await db("Tasks").where({ id_task: taskId }).del();
-    return { message: "Tarea eliminada correctamente" };
+    return { message: "Task deleted successfully" };
 }
 
 const findTasksByHouse = async (houseId, user, filters = {}) => {
@@ -166,7 +168,7 @@ const findTasksByHouse = async (houseId, user, filters = {}) => {
             .where({ id_house: houseId, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes acceso a las tareas de esta casa" };
+            throw { status: 403, message: "You don't have access to the tasks of this house" };
         }
     }
 
@@ -179,7 +181,8 @@ const findTasksByHouse = async (houseId, user, filters = {}) => {
             "t.expiration_date",
             "t.id_house",
             "t.id_user",
-            "u.name as user_name"
+            "u.name as user_name",
+            "u.image as user_image"
         )
         .leftJoin("Users as u", "t.id_user", "u.id_user")
         .where({ "t.id_house": houseId });
@@ -211,9 +214,12 @@ const findTasksByUser = async (userId, user, filters = {}) => {
             "t.expiration_date",
             "t.id_house",
             "h.name as house_name",
-            "t.id_user"
+            "t.id_user",
+            "u.name as user_name",
+            "u.image as user_image"
         )
         .join("Houses as h", "t.id_house", "h.id_house")
+        .leftJoin("Users as u", "t.id_user", "u.id_user")
         .where({ "t.id_user": userId });
 
     // Si no es admin y no es su propio perfil
@@ -232,7 +238,7 @@ const findTasksByUser = async (userId, user, filters = {}) => {
             .first();
         
         if (!sharedHouses) {
-            throw { status: 403, message: "No tienes permiso para ver las tareas de este usuario" };
+            throw { status: 403, message: "You don't have permission to view the tasks of this user" };
         }
     }
 

@@ -7,26 +7,26 @@ const createHouseValidators = [
   body("name")
     .trim()
     .notEmpty()
-    .withMessage("El nombre de la casa es obligatorio")
+    .withMessage("The house name is required")
     .isLength({ max: 100 })
-    .withMessage("El nombre no puede exceder los 100 caracteres"),
+    .withMessage("Name cannot exceed 100 characters"),
 
   body("address")
     .optional()
     .trim()
     .isLength({ max: 255 })
-    .withMessage("La dirección no puede exceder los 255 caracteres"),
+    .withMessage("Address cannot exceed 255 characters"),
 
   body("number_of_rooms")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("El número de habitaciones debe ser un número entero mayor a 0"),
+    .withMessage("Number of rooms must be an integer greater than 0"),
 
   body("image")
     .optional()
     .trim()
     .isLength({ max: 255 })
-    .withMessage("La URL de la imagen no puede exceder los 255 caracteres"),
+    .withMessage("Image URL cannot exceed 255 characters"),
 ];
 
 /**
@@ -35,32 +35,32 @@ const createHouseValidators = [
 const updateHouseValidators = [
   param("houseId")
     .isInt()
-    .withMessage("El ID de la casa debe ser un número válido"),
+    .withMessage("House ID must be a valid number"),
 
   body("name")
     .optional()
     .trim()
     .notEmpty()
-    .withMessage("El nombre de la casa no puede estar vacío")
+    .withMessage("House name cannot be empty")
     .isLength({ max: 100 })
-    .withMessage("El nombre no puede exceder los 100 caracteres"),
+    .withMessage("Name cannot exceed 100 characters"),
 
   body("address")
     .optional()
     .trim()
     .isLength({ max: 255 })
-    .withMessage("La dirección no puede exceder los 255 caracteres"),
+    .withMessage("Address cannot exceed 255 characters"),
 
   body("number_of_rooms")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("El número de habitaciones debe ser un número entero mayor a 0"),
+    .withMessage("Number of rooms must be an integer greater than 0"),
 
   body("image")
     .optional()
     .trim()
     .isLength({ max: 255 })
-    .withMessage("La URL de la imagen no puede exceder los 255 caracteres"),
+    .withMessage("Image URL cannot exceed 255 characters"),
 
 ];
 
@@ -70,7 +70,7 @@ const updateHouseValidators = [
 const houseIdParamValidator = [
   param("houseId")
     .isInt()
-    .withMessage("El ID de la casa debe ser un número válido"),
+    .withMessage("House ID must be a valid number"),
 ];
 
 module.exports = {

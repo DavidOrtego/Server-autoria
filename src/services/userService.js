@@ -10,7 +10,7 @@ const { hashPassword } = require("../utils/encryption");
 const findUserById = async (userId, requester) => {
   // Solo admin o el propio usuario pueden ver los detalles
   if (requester.rol !== 'admin' && parseInt(requester.id) !== parseInt(userId)) {
-      throw { status: 403, message: "No tienes permiso para acceder a esta información" };
+      throw { status: 403, message: "You don't have permission to access this information" };
   }
 
   const user = await db("Users")
@@ -20,7 +20,7 @@ const findUserById = async (userId, requester) => {
 
 
   if (!user) {
-    throw { status: 404, message: "Usuario no encontrado" };
+    throw { status: 404, message: "User not found" };
   }
   return user;
 };
@@ -80,13 +80,13 @@ const deleteUser = async (userId, requester) => {
   if (tasksCount.total > 0 || expensesCount.total > 0) {
       throw {
           status: 409,
-          message: `No se puede borrar el usuario porque aún tiene ${tasksCount.total} tareas y ${expensesCount.total} gastos asociados.`
+          message: `Cannot delete the user because it still has ${tasksCount.total} tasks and ${expensesCount.total} expenses associated.`
       };
   }
   //Si todo está limpio, procedemos a borrar su membresía en las casas y luego el usuario
   await db("HouseMembers").where({ id_user: userId }).del();
   await db("Users").where({ id_user: userId }).del();
-  return { message: "Usuario eliminado correctamente" };
+  return { message: "User deleted successfully" };
 };
 
 

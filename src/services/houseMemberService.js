@@ -12,7 +12,7 @@ const findMembersByHouseId = async (houseId, user) => {
             .where({ id_house: houseId, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes permiso para ver los miembros de esta casa" };
+            throw { status: 403, message: "You don't have permission to view the members of this house" };
         }
     }
 
@@ -40,7 +40,7 @@ const findMembersByHouseId = async (houseId, user) => {
 const findHousesByUserId = async (userId, user) => {
     // Solo el propio usuario o el admin pueden ver en qué casas está metido
     if (user.rol !== 'admin' && parseInt(user.id) !== parseInt(userId)) {
-        throw { status: 403, message: "No tienes permiso para ver esta información" };
+        throw { status: 403, message: "You don't have permission to view this information" };
     }
 
     const houses = await db("HouseMembers")
@@ -73,14 +73,14 @@ const addMemberToHouse = async (houseId, email, user) => {
             .where({ id_house: houseId, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "Solo los miembros de la casa pueden añadir a otros" };
+            throw { status: 403, message: "Only house members can add others" };
         }
     }
 
     // Buscar al usuario por email
     const targetUser = await db("Users").where({ email }).first();
     if (!targetUser) {
-        throw { status: 404, message: "No se encontró ningún usuario con ese email" };
+        throw { status: 404, message: "No user found with that email" };
     }
     
     const targetUserId = targetUser.id_user;
@@ -91,7 +91,7 @@ const addMemberToHouse = async (houseId, email, user) => {
         .first();
     
     if (existing) {
-        throw { status: 400, message: "El usuario ya es miembro de esta casa" };
+        throw { status: 400, message: "User is already a member of this house" };
     }
 
     const [id] = await db("HouseMembers").insert({
@@ -115,7 +115,7 @@ const removeMemberFromHouse = async (houseId, userId, user) => {
             .where({ id_house: houseId, id_user: user.id })
             .first();
         if (!membership) {
-            throw { status: 403, message: "No tienes permiso para eliminar miembros de esta casa" };
+            throw { status: 403, message: "You don't have permission to remove members from this house" };
         }
     }
 
@@ -124,7 +124,7 @@ const removeMemberFromHouse = async (houseId, userId, user) => {
         .del();
     
     if (deletedCount === 0) {
-        throw { status: 404, message: "No se encontró el miembro en la casa" };
+        throw { status: 404, message: "Member not found in the house" };
     }
     
     return deletedCount;

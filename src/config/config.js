@@ -11,7 +11,7 @@ try {
 
   if (!swaggerDocument) {
     throw new Error(
-      "El archivo openapi.yaml está vacío o no se ha guardado correctamente.",
+      "The openapi.yaml file is empty or has not been saved correctly.",
     );
   }
 
@@ -43,9 +43,9 @@ try {
     config = yaml.load(fs.readFileSync(absoluteConfigPath, "utf-8"));
   }
 } catch (error) {
-  console.error("\n❌ ERROR CRÍTICO AL ARRANCAR EL SERVIDOR ❌");
-  console.error("Fallo en el sistema de configuración.");
-  console.error(`Detalle del error: ${error.message}\n`);
+  console.error("\n❌ CRITICAL ERROR STARTING SERVER ❌");
+  console.error("System configuration failure.");
+  console.error(`Error detail: ${error.message}\n`);
   process.exit(1);
 }
 

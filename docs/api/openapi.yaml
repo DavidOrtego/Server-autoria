@@ -1,0 +1,695 @@
+openapi: 3.0.0
+info:
+  title: Vives House API
+  description: API para la gestión de tareas y gastos en casas compartidas.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        rol:
+          type: string
+        image:
+          type: string
+    House:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        number_of_rooms:
+          type: integer
+        image:
+          type: string
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+          enum: [pending, complete]
+        expiration_date:
+          type: string
+          format: date-time
+        id_house:
+          type: integer
+        id_user:
+          type: integer
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+          format: float
+        description:
+          type: string
+        date:
+          type: string
+          format: date-time
+        id_user:
+          type: integer
+        id_house:
+          type: integer
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Auth
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Juan Perez
+                email:
+                  type: string
+                  format: email
+                  example: juan@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  example: password123
+                rol:
+                  type: string
+                  enum: [admin, member]
+                  default: member
+      responses:
+        '201':
+          description: Usuario registrado correctamente
+        '400':
+          description: Errores de validación
+        '409':
+          description: El email ya está en uso
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Auth
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: juan@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Login exitoso
+        '401':
+          description: Credenciales incorrectas
+        '404':
+          description: Usuario no encontrado
+
+  /auth/me:
+    get:
+      summary: Obtener datos del usuario autenticado
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Datos del usuario obtenidos correctamente
+        '401':
+          description: No autorizado
+
+  /users:
+    get:
+      summary: Obtiene todos los usuarios (Admin)
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      summary: Obtiene un usuario específico
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Actualiza un usuario
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                rol:
+                  type: string
+                  enum: [admin, member]
+                image:
+                  type: string
+      responses:
+        '200':
+          description: Usuario actualizado
+    delete:
+      summary: Elimina un usuario (Admin)
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Usuario eliminado
+
+  /houses:
+    get:
+      summary: Obtiene todas las casas
+      tags:
+        - Houses
+      responses:
+        '200':
+          description: Lista de casas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/House'
+    post:
+      summary: Crea una nueva casa
+      tags:
+        - Houses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                number_of_rooms:
+                  type: integer
+                image:
+                  type: string
+      responses:
+        '201':
+          description: Casa creada
+
+  /houses/{houseId}:
+    get:
+      summary: Obtiene una casa específica
+      tags:
+        - Houses
+      parameters:
+        - name: houseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos de la casa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/House'
+    put:
+      summary: Actualiza una casa
+      tags:
+        - Houses
+      parameters:
+        - name: houseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                number_of_rooms:
+                  type: integer
+                image:
+                  type: string
+      responses:
+        '200':
+          description: Casa actualizada
+    delete:
+      summary: Elimina una casa
+      tags:
+        - Houses
+      parameters:
+        - name: houseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Casa eliminada
+
+  /house-members/house/{id_house}:
+    get:
+      summary: Obtener miembros de una casa específica
+      tags:
+        - House Members
+      parameters:
+        - name: id_house
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de miembros
+
+  /house-members/user/{id_user}:
+    get:
+      summary: Obtener las casas de un usuario específico
+      tags:
+        - House Members
+      parameters:
+        - name: id_user
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de casas
+
+  /house-members:
+    post:
+      summary: Añadir un miembro a una casa
+      tags:
+        - House Members
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id_house
+                - email
+              properties:
+                id_house:
+                  type: integer
+                email:
+                  type: string
+      responses:
+        '201':
+          description: Miembro añadido
+
+  /house-members/house/{id_house}/user/{id_user}:
+    delete:
+      summary: Eliminar un miembro de una casa
+      tags:
+        - House Members
+      parameters:
+        - name: id_house
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id_user
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Miembro eliminado
+
+  /tasks:
+    get:
+      summary: Obtiene todas las tareas
+      tags:
+        - Tasks
+      responses:
+        '200':
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: Crea una nueva tarea
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - id_house
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                state:
+                  type: string
+                  enum: [pending, complete]
+                expiration_date:
+                  type: string
+                  format: date-time
+                id_house:
+                  type: integer
+                id_user:
+                  type: integer
+      responses:
+        '201':
+          description: Tarea creada
+
+  /tasks/{taskId}:
+    get:
+      summary: Obtiene una tarea específica
+      tags:
+        - Tasks
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos de la tarea
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    put:
+      summary: Actualiza una tarea
+      tags:
+        - Tasks
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                state:
+                  type: string
+                  enum: [pending, complete]
+                expiration_date:
+                  type: string
+                  format: date-time
+                id_house:
+                  type: integer
+                id_user:
+                  type: integer
+      responses:
+        '200':
+          description: Tarea actualizada
+    delete:
+      summary: Elimina una tarea
+      tags:
+        - Tasks
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Tarea eliminada
+
+  /tasks/house/{houseId}:
+    get:
+      summary: Obtiene las tareas de una casa
+      tags:
+        - Tasks
+      parameters:
+        - name: houseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de tareas
+
+  /tasks/user/{userId}:
+    get:
+      summary: Obtiene las tareas de un usuario
+      tags:
+        - Tasks
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de tareas
+
+  /expenses:
+    get:
+      summary: Obtiene todos los gastos
+      tags:
+        - Expenses
+      responses:
+        '200':
+          description: Lista de gastos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+    post:
+      summary: Crea un nuevo gasto
+      tags:
+        - Expenses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - description
+                - date
+                - id_user
+                - id_house
+              properties:
+                amount:
+                  type: number
+                  format: float
+                description:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+                id_user:
+                  type: integer
+                id_house:
+                  type: integer
+      responses:
+        '201':
+          description: Gasto creado
+
+  /expenses/{expenseId}:
+    get:
+      summary: Obtiene un gasto específico
+      tags:
+        - Expenses
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos del gasto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+    put:
+      summary: Actualiza un gasto
+      tags:
+        - Expenses
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                description:
+                  type: string
+                date:
+                  type: string
+                  format: date-time
+                id_user:
+                  type: integer
+                id_house:
+                  type: integer
+      responses:
+        '200':
+          description: Gasto actualizado
+    delete:
+      summary: Elimina un gasto
+      tags:
+        - Expenses
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Gasto eliminado
+
+  /expenses/house/{houseId}:
+    get:
+      summary: Obtiene los gastos de una casa
+      tags:
+        - Expenses
+      parameters:
+        - name: houseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de gastos
+
+  /expenses/user/{userId}:
+    get:
+      summary: Obtiene los gastos de un usuario
+      tags:
+        - Expenses
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de gastos

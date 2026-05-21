@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: vives_db_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docs/database/init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./docs/database/procedures.sql:/docker-entrypoint-initdb.d/2-procedures.sql
+      - ./docs/database/seed.sql:/docker-entrypoint-initdb.d/3-seed.sql
+      - ./docs/database/run_procedures.sql:/docker-entrypoint-initdb.d/4-run-procedures.sql
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:

@@ -2,9 +2,9 @@ name: Node.js CI (Tests)
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [22.x]
 
     steps:
     - name: Checkout repository
@@ -23,15 +23,18 @@ jobs:
         echo "PORT=3000" >> .env
         echo "DATABASE_HOST=127.0.0.1" >> .env
         echo "DATABASE_PORT=3306" >> .env
-        echo "DATABASE_USER=root" >> .env
-        echo "DATABASE_PASS=password" >> .env
+        echo "DATABASE_USER=user_vives" >> .env
+        echo "DATABASE_PASS=password_vives" >> .env
         echo "DATABASE_NAME=vives_db" >> .env
         echo "JWT_SECRET=token-secreto" >> .env
         
         echo "MYSQL_ROOT_PASSWORD=password" >> .env
         echo "MYSQL_DATABASE=vives_db" >> .env
-        echo "MYSQL_USER=vives_user" >> .env
-        echo "MYSQL_PASSWORD=password" >> .env
+        echo "MYSQL_USER=user_vives" >> .env
+        echo "MYSQL_PASSWORD=password_vives" >> .env
+
+        # Copiamos el archivo de configuración base
+        cp config.local.yaml.example config.local.yaml
 
     - name: Start Database with Docker Compose
       run: docker compose up -d
@@ -39,9 +42,10 @@ jobs:
     - name: Wait for Database to initialize
       run: |
         echo "Waiting for MariaDB to accept connections..."
-        timeout 60s bash -c 'until docker exec vives_db_container mysqladmin ping -h localhost -uroot -ppassword --silent; do sleep 2; done'
-        echo "MariaDB is up! Waiting a few extra seconds to ensure init scripts (seeds/procedures) are fully applied..."
-        sleep 10
+        # Usamos el cliente mysqladmin que viene preinstalado en la máquina de GitHub Actions
+        timeout 60s bash -c 'until mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -ppassword --silent; do sleep 2; done'
+        echo "MariaDB is up! Waiting 15 extra seconds to ensure init scripts (seeds/procedures) are fully applied..."
+        sleep 15
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -66,4 +70,3 @@ jobs:
 
     - name: Run Postman Tests
       run: newman run VivesHouseAPI_PostmanCollection.json --env-var "base_url=http://127.0.0.1:3000/api"
-

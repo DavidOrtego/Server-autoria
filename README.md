@@ -72,6 +72,13 @@ npm run dev
 El servidor de desarrollo con autorecarga (Nodemon) estará disponible por defecto en `http://localhost:3000`. 
 Puedes revisar la documentación técnica de la API visitando `http://localhost:3000/api-docs`.
 
+### 🐳 Despliegue con Docker (API)
+El servidor incluye un `Dockerfile` optimizado basado en Node 22 Alpine. Puedes encapsular y ejecutar toda la API en un contenedor independiente ejecutando:
+```bash
+docker build -t vives-server .
+docker run -p 3000:3000 --env-file .env vives-server
+```
+
 ### 🧪 Pruebas (Testing)
 
 El servidor cuenta con varios mecanismos para asegurar la calidad del código y el correcto funcionamiento de los endpoints:

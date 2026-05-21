@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
@@ -19,7 +20,11 @@ const { errorHandler, notFound } = require("./middlewares/errorHandler");
 const app = express();
 
 // Middlewares base
-app.use(cors());
+const corsOrigin = process.env.CORS_ORIGIN || process.env.cors_origin || "http://localhost:5173";
+app.use(cors({
+  origin: corsOrigin.includes(",") ? corsOrigin.split(",").map(o => o.trim()) : corsOrigin,
+  credentials: true, 
+}));
 app.use(express.json());
 
 // Leer y parsear el archivo openapi.yaml

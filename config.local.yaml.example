@@ -1,0 +1,12 @@
+service:
+  port: 3000
+
+db:
+  host: "127.0.0.1"
+  port: 3306
+  user: "user_vives"
+  password: "password_vives"
+  database: "vives_db"
+
+jwt:
+  secret: "super_secret_key_change_me"

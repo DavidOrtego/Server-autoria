@@ -13,6 +13,7 @@ const houseRoutes = require("./routes/houseRoutes");
 const houseMemberRoutes = require("./routes/houseMemberRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 // Importar los manejadores de errores globales
 const { errorHandler, notFound } = require("./middlewares/errorHandler");
@@ -44,7 +45,7 @@ app.use("/api/houses", houseRoutes);
 app.use("/api/house-members", houseMemberRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/expenses", expenseRoutes);
-
+app.use("/api/reviews", reviewRoutes);
 
 // MANEJO DE ERRORES
 

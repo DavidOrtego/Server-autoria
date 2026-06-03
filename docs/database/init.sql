@@ -51,3 +51,13 @@ CREATE TABLE IF NOT EXISTS Expenses (
     FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE RESTRICT,
     FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE RESTRICT
 );
+
+CREATE TABLE IF NOT EXISTS Reviews (
+    id_review INT AUTO_INCREMENT PRIMARY KEY,
+    rating INT,
+    comment VARCHAR(255),
+    id_house INT NOT NULL,
+    id_user INT NOT NULL,
+    FOREIGN KEY (id_house) REFERENCES Houses(id_house) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES Users(id_user) ON DELETE CASCADE
+);
